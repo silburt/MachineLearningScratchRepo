@@ -1,0 +1,18 @@
+Custom Monthly Summaries of GHCN-Daily CSV
+
+Symbols:
+DATE - YYYYMMDD
+EMXP - Extreme maximum daily precipitation (tenths of mm)
+MMNT - Monthly Mean minimum temperature (tenths(!) of degrees Celsius)
+EMXT - Extreme maximum daily temperature (tenths(!) of degrees Celsius)
+MXSD - Maximum snow depth (mm)
+MMXT - Monthly Mean maximum temperature (tenths(!) of degrees Celsius)
+TPCP - Total precipitation (tenths of mm)
+EMNT - Extreme minimum daily temperature (tenths(!) of degrees Celsius)
+MNTM - Monthly mean temperature (tenths(!) of degrees Celsius)
+TSNW - Total snow fall (mm)
+
+Start Date	1840 -03-01
+End Date	2015 -12-01
+
+Station: GHCND:CA006158350 - TORONTO, CA
