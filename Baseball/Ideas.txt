@@ -1,0 +1,11 @@
+Trends
+-Best value players in the MLB right now.
+-Performance vs. salary.
+-Ethnicity vs. salary (are players from different continents paid on average more/less).
+
+Machine Learning
+-Most important characteristics for winning a world series:
+1. Team stats (RBIs, RC, HR, salary, etc.).
+2. previous postseason stats?
+
+-Players most likely to choke in the playoffs?
