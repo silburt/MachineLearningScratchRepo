@@ -566,7 +566,7 @@ lgID           League
 teamID         Team
 franchID       Franchise (links to TeamsFranchise table)
 divID          Team's division
-Rank           Position in final standings
+Rank           Position in final standings (A.S. of your division. i.e. Rank 1 for each division.)
 G              Games played
 GHome          Games played at home
 W              Wins
