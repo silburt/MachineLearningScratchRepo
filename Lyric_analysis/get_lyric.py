@@ -23,6 +23,7 @@ def clean_names(artist, song):
     artist = artist.split(',')[0]   #only take first of multiple artists
     song = song.split('(')[0]       #exclude (feat. ) or other details
     song = song.split('-')[0]       #exclude extra details
+    song = song.split('/')[0]       #exclude extra details
     ch = ['?','!']
     for c in ch:
         song = song.replace(c,'')
@@ -54,22 +55,24 @@ def get_song_api_path(artist, song):
         #if hit["result"]["title"] == song_title:
         if hit["result"]["primary_artist"]["name"] == artist:
             return hit["result"]["api_path"], artist, song
-    print 'Couldnt find %s - %s'%(artist, song)
-    return None
+    print "Couldnt find: %s - %s"%(artist, song)
+    return None, artist, song
 
 ###### Main Loop ######
 if __name__ == '__main__':
-#    song_name = "Who's Your Daddy"
-#    artist_name = "Toby Keith"
-#    song_api_path = get_song_api_path(artist_name, song_name)
+#    song_name = "Smile"
+#    artist_name = "Lonestar"
+#    song_api_path, artist, song = get_song_api_path(artist_name, song_name)
 #    lyrics = get_lyrics(song_api_path)
-#    text_file = open("Output.txt", "w")
+#    print lyrics
 
-    dir = 'playlists/country/'
+    dir = 'playlists/hip-hop/'
     tracks = pd.read_csv(glob.glob('%s*.csv'%dir)[0])
     
     # Main Loop
-    for index, track in tracks[0:5].iterrows():
+    skipped_tracks = 0
+    for index, track in tracks.iterrows():
+        print index
         song_api_path, artist, song = get_song_api_path(track['Artist Name'], track['Track Name'])
         if song_api_path:
             #get lyrics
@@ -79,3 +82,8 @@ if __name__ == '__main__':
             artist, song = artist.replace(' ','_'), song.replace(' ','_')
             with open('%s%s-%s.txt'%(dir,artist,song), 'w') as out:
                 out.write(lyrics)
+        else:
+            skipped_tracks += 1
+
+    n_tracks = len(tracks)
+    print "successfully processed %d of %d tracks"%(n_tracks-skipped_tracks, n_tracks)
