@@ -66,7 +66,7 @@ if __name__ == '__main__':
 #    lyrics = get_lyrics(song_api_path)
 #    print lyrics
 
-    dir = 'playlists/hip-hop/'
+    dir = 'playlists/pop/'
     tracks = pd.read_csv(glob.glob('%s*.csv'%dir)[0])
     
     # Main Loop

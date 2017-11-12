@@ -106,7 +106,7 @@ def main(files,seq_length,epochs):
 if __name__ == '__main__':
     n=-1
     seq_length = 30
-    epochs = 10
+    epochs = 6
     
     dir_ = 'playlists/country/'
     files = glob.glob('%s*.txt'%dir_)[0:n]
