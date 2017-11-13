@@ -66,7 +66,7 @@ if __name__ == '__main__':
 #    lyrics = get_lyrics(song_api_path)
 #    print lyrics
 
-    dir = 'playlists/pop/'
+    dir = 'playlists/rock/'
     tracks = pd.read_csv(glob.glob('%s*.csv'%dir)[0])
     
     # Main Loop
@@ -79,7 +79,7 @@ if __name__ == '__main__':
             lyrics = get_lyrics(song_api_path)
             
             #write to txt file
-            artist, song = artist.replace(' ','_'), song.replace(' ','_')
+            artist, song = artist.replace(' ','_').replace('/',''), song.replace(' ','_')
             with open('%s%s-%s.txt'%(dir,artist,song), 'w') as out:
                 out.write(lyrics)
         else:
