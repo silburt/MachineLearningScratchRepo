@@ -9,10 +9,6 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 
-####### Helper Functions ###########
-def name(dir):
-    return dir.split('playlists/')[1]
-
 #remove useless words
 def spam_filter(labels, counts):
     spam = ['chorus','verse','produce']
@@ -24,7 +20,6 @@ def spam_filter(labels, counts):
             del labels[i]
             del counts[i]
             n_labels -= 1
-            print "found spam: %s"%l
         else:
             i += 1
     return labels, counts
@@ -64,7 +59,7 @@ def get_common_pairs(data, n_words, n_grams, max_pos):
             labels.append(l)
             pos2.append(i)
 
-    return labels, [pos1,pos2], [counts1,counts2]
+    return labels, [pos1, pos2], [counts1, counts2]
 
 # https://stackoverflow.com/questions/11763613/python-list-of-ngrams-with-frequencies
 ####### Main Functions ###########
@@ -110,34 +105,55 @@ def get_stats(dir, norm, n_songs, print_=0):
 ####### Arguments ###########
 if __name__ == '__main__':
     dirs = ['playlists/rock','playlists/hip-hop', 'playlists/country', 'playlists/pop']
-    norm = 0
+    norm = 1
     n_songs = 800
+    n_grams = 1
+    n_common_words = 50
 
+    #get data
     data = {}
     for i in range(len(dirs)):
         data[i] = get_stats(dirs[i],norm,n_songs)
 
-    #get top common pairs
-    combos = [(0,1),(0,2),(0,3),(1,2),(1,3),(2,3)]
-    n_words, n_grams, max_pos = 50, 1, 100
-    for i1,i2 in combos:
-        d = [data[i1],data[i2]]
-        labels, pos, counts = get_common_pairs(d, n_words, n_grams, max_pos)
-        
-        r_labels = np.arange(max(pos[0]))
-        plt.plot(r_labels, r_labels)
-        plt.plot(r_labels, 2*r_labels, 'g')
-        plt.plot(2*r_labels, r_labels, 'g')
-        plt.plot(pos[0], pos[1], '.')
-        for i in range(len(pos[0])):
-            plt.text(pos[0][i]+0.5, pos[1][i]+0.5, labels[i], size=8)
-        name1, name2 = dirs[i1].split('playlists/')[1], dirs[i2].split('playlists/')[1]
-        plt.xlabel('%s rank'%name1)
-        plt.ylabel('%s rank'%name2)
-        plt.xlim([0,max_pos+10])
-        plt.ylim([0,max_pos+10])
-        plt.savefig('images/wordcorr_%s_%s.png'%(name1,name2))
-        plt.clf()
+    #plot common pairs between genres
+    plot_common = 1
+    if plot_common == 1:
+        combos = [(0,1),(0,2),(0,3),(1,2),(1,3),(2,3)]
+        max_pos = 100
+        for i1,i2 in combos:
+            d = [data[i1],data[i2]]
+            labels, pos, counts = get_common_pairs(d, n_common_words, n_grams, max_pos)
+            
+            r_labels = np.arange(max_pos)
+            plt.plot(r_labels, r_labels)
+            plt.plot(r_labels, 2*r_labels, 'g')
+            plt.plot(2*r_labels, r_labels, 'g')
+            plt.plot(pos[0], pos[1], '.')
+            for i in range(len(pos[0])):
+                plt.text(pos[0][i]+0.5, pos[1][i]+0.5, labels[i], size=8)
+            name1, name2 = dirs[i1].split('playlists/')[1], dirs[i2].split('playlists/')[1]
+            plt.xlabel('%s rank'%name1)
+            plt.ylabel('%s rank'%name2)
+            plt.xlim([0,max_pos+10])
+            plt.ylim([0,max_pos+10])
+            plt.savefig('images/wordcorr_%s_%s.png'%(name1,name2))
+            plt.clf()
 
+    #plot distribution of words
+    plot_words = 1
+    if plot_words == 1:
+        ylabel = 'total counts'
+        if norm == 1:
+            ylabel = 'counts/(song*word)'
+        for i in range(len(data)):
+            labels, count = zip(*data[i][n_grams-1].most_common(n_common_words))
+            labels, count = spam_filter(labels, count)
+            x, name = range(len(count)), dirs[i].split('playlists/')[1]
+            plt.plot(x, count)
+            plt.xticks(x, labels, rotation='vertical',fontsize=8)
+            plt.ylabel(ylabel)
+            plt.title(name)
+            plt.savefig('images/worddist_%s.png'%name)
+            plt.clf()
 
 
