@@ -8,6 +8,7 @@ from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
+from keras.models import load_model
 
 def unicodetoascii(text):
     TEXT = (text.
@@ -63,7 +64,8 @@ def process_song(song_dir):
     song = unicodetoascii(open(song_dir,'r').read().lower())
     return song
 
-def main(files,seq_length,epochs):
+def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
+    files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
     songs = []
     for i,f in enumerate(files):
         songs.append(process_song(f))
@@ -75,7 +77,7 @@ def main(files,seq_length,epochs):
 
     dataX = []
     dataY = []
-    for i in range(len(songs)):
+    for i in range(n_songs):
         song_text = songs[i]
         for j in range(0,len(song_text)-seq_length, 1):
             seq_in = song_text[j:j + seq_length]
@@ -93,22 +95,50 @@ def main(files,seq_length,epochs):
     # one hot encode the output variable
     y = np_utils.to_categorical(dataY)
 
-    model = Sequential()
-    model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2])))
-    model.add(Dropout(0.2))
-    model.add(Dense(y.shape[1], activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam')
+    try:
+        model = model = load_model(dir_model)
+        print "successfully loaded model"
+    except:
+        if train == 1:
+            print "couldnt find model. Training... (this will take a while)"
+            model = Sequential()
+            model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2])))
+            model.add(Dropout(0.2))
+            model.add(Dense(y.shape[1], activation='softmax'))
+            model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-    model.fit(X, y, epochs=epochs, batch_size=128)
-    model.save('models/model.h5')
-    print "successfully trained and saved model"
+            model.fit(X, y, epochs=epochs, batch_size=128)
+            model.save('models/model.h5')
+            print "successfully trained and saved model"
+        else:
+            print "couldnt find model. Train=0. Exiting."
+            return None
+
+    # text generation
+    start = np.random.randint(0, len(dataX)-1)
+    pattern = dataX[start]
+    print "Seed:"
+    print "\"", ''.join([int_to_char[value] for value in pattern]), "\""
+    # generate characters
+    for i in range(1000):
+        x = np.reshape(pattern, (1, len(pattern), 1))
+        x = x / float(n_chars)
+        prediction = model.predict(x, verbose=0)
+        index = np.argmax(prediction)
+        result = int_to_char[index]
+        seq_in = [int_to_char[value] for value in pattern]
+        sys.stdout.write(result)
+        pattern.append(index)
+        pattern = pattern[1:len(pattern)]
+    print "\nDone."
+
 
 if __name__ == '__main__':
-    n=-1
+    n_songs=-1
     seq_length = 30
     epochs = 6
     
-    dir_ = 'playlists/country/'
-    files = glob.glob('%s*.txt'%dir_)[0:n]
+    dir_lyrics = 'playlists/country/'
+    dir_model = 'models/country.h5'
 
-    main(files,seq_length,epochs)
+    main(dir_lyrics,dir_model,n_songs,seq_length,epochs)
