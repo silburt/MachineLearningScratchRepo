@@ -75,9 +75,9 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
     char_to_int = dict((c, i) for i, c in enumerate(chars))
     int_to_char = dict((i, c) for i, c in enumerate(chars))
 
-    dataX = []
-    dataY = []
-    for i in range(n_songs):
+    dataX, dataY = [], []
+    #for i in range(n_songs):
+    for i in range(5):
         song_text = songs[i]
         for j in range(0,len(song_text)-seq_length, 1):
             seq_in = song_text[j:j + seq_length]
@@ -96,7 +96,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
     y = np_utils.to_categorical(dataY)
 
     try:
-        model = model = load_model(dir_model)
+        model = load_model(dir_model)
         print "successfully loaded model"
     except:
         if train == 1:
