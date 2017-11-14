@@ -1,3 +1,4 @@
+#https://github.com/vlraik/word-level-rnn-keras/blob/master/lstm_text_generation.py
 import numpy as np
 import glob
 import sys
@@ -98,9 +99,9 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
         if train == 1:
             print "couldnt find model. Training... (this will take a while)"
             model = Sequential()
-            model.add(LSTM(512, input_shape=(X.shape[1], X.shape[2])))
+            model.add(LSTM(512, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
             model.add(Dropout(0.2))
-            model.add(LSTM(512))
+            model.add(LSTM(512), return_sequences=False)
             model.add(Dropout(0.2))
             model.add(Dense(y.shape[1], activation='softmax'))
             model.compile(loss='categorical_crossentropy', optimizer='adam')
