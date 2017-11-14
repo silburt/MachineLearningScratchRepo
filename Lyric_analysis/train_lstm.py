@@ -101,7 +101,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
             model = Sequential()
             model.add(LSTM(512, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
             model.add(Dropout(0.2))
-            model.add(LSTM(512), return_sequences=False)
+            model.add(LSTM(512, return_sequences=False))
             model.add(Dropout(0.2))
             model.add(Dense(y.shape[1], activation='softmax'))
             model.compile(loss='categorical_crossentropy', optimizer='adam')
