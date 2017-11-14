@@ -66,7 +66,7 @@ def process_song(song_dir):
 
 def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
-    songs = []
+    songs, n_songs = [], len(files)
     for i,f in enumerate(files):
         songs.append(process_song(f))
 
@@ -76,8 +76,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
     int_to_char = dict((i, c) for i, c in enumerate(chars))
 
     dataX, dataY = [], []
-    #for i in range(n_songs):
-    for i in range(5):
+    for i in range(n_songs):
         song_text = songs[i]
         for j in range(0,len(song_text)-seq_length, 1):
             seq_in = song_text[j:j + seq_length]
