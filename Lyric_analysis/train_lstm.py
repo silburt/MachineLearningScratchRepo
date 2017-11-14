@@ -88,12 +88,10 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
     n_patterns = len(dataX)
     print "Total Patterns: ", n_patterns
 
-    # reshape X to be [samples, time steps, features]
-    X = np.reshape(dataX, (n_patterns, seq_length, 1))
-    # normalize
-    X = X / float(n_chars)
-    # one hot encode the output variable
-    y = np_utils.to_categorical(dataY)
+    # prepare
+    X = np.reshape(dataX, (n_patterns,seq_length,1))    # reshape X:[samples,time steps,features]
+    X = X / float(n_chars)                              # normalize
+    y = np_utils.to_categorical(dataY)                  # 1-hot encode the output variable
 
     try:
         model = load_model(dir_model)
@@ -115,12 +113,13 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
             return None
 
     # text generation
-    start = np.random.randint(0, len(dataX)-1)
-    pattern = dataX[start]
+    seed = np.random.randint(0, n_songs)
+    pattern = songs[seed][0:seq_length]
+    print pattern
     print "Seed:"
     print "\"", ''.join([int_to_char[value] for value in pattern]), "\""
     # generate characters
-    for i in range(1000):
+    for i in range(100):
         x = np.reshape(pattern, (1, len(pattern), 1))
         x = x / float(n_chars)
         prediction = model.predict(x, verbose=0)
@@ -132,9 +131,8 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
         pattern = pattern[1:len(pattern)]
     print "\nDone."
 
-
 if __name__ == '__main__':
-    n_songs=-1
+    n_songs= -1
     seq_length = 30
     epochs = 6
     
