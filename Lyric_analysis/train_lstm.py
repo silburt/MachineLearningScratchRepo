@@ -81,7 +81,6 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
         for j in range(0,len(song_text)-seq_length, 1):
             seq_in = song_text[j:j + seq_length]
             seq_out = song_text[j + seq_length]
-            #print repr(seq_in),"<<>>", repr(seq_out)
             dataX.append([char_to_int[char] for char in seq_in])
             dataY.append(char_to_int[seq_out])
     n_patterns = len(dataX)
@@ -101,7 +100,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
             model = Sequential()
             model.add(LSTM(512, input_shape=(X.shape[1], X.shape[2])))
             model.add(Dropout(0.2))
-            model.add(LSTM(512, input_shape=(X.shape[1], X.shape[2])))
+            model.add(LSTM(512))
             model.add(Dropout(0.2))
             model.add(Dense(y.shape[1], activation='softmax'))
             model.compile(loss='categorical_crossentropy', optimizer='adam')
