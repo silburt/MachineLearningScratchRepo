@@ -105,7 +105,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
             model.compile(loss='categorical_crossentropy', optimizer='adam')
 
             model.fit(X, y, epochs=epochs, batch_size=128)
-            model.save('models/model.h5')
+            model.save(dir_model)
             print "successfully trained and saved model"
         else:
             print "couldnt find model. Train=0. Exiting."
@@ -121,8 +121,9 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
     for i in range(100):
         x = np.reshape(pattern, (1, len(pattern), 1))
         x = x / float(n_chars)
-        prediction = model.predict(x, verbose=0)
-        index = np.argmax(prediction)
+        pred = model.predict(x, verbose=0)
+        #index = np.argmax(prediction)
+        index = np.random.choice(len(pred[0]), p=pred[0])
         result = int_to_char[index]
         seq_in = [int_to_char[value] for value in pattern]
         sys.stdout.write(result)
