@@ -10,6 +10,7 @@ from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 from keras.models import load_model
+import tensorflow as tf
 
 def unicodetoascii(text):
     TEXT = (text.
@@ -141,4 +142,5 @@ if __name__ == '__main__':
     dir_lyrics = 'playlists/country/'
     dir_model = 'models/country_letters.h5'
 
+    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #is gpu device being used
     main(dir_lyrics,dir_model,n_songs,seq_length,epochs)
