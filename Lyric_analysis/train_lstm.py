@@ -64,7 +64,7 @@ def process_song(song_dir):
     song = unicodetoascii(open(song_dir,'r').read().lower())
     return song
 
-def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
+def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
     songs, n_songs = [], len(files)
     for i,f in enumerate(files):
@@ -99,7 +99,9 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
         if train == 1:
             print "couldnt find model. Training... (this will take a while)"
             model = Sequential()
-            model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2])))
+            model.add(LSTM(512, input_shape=(X.shape[1], X.shape[2])))
+            model.add(Dropout(0.2))
+            model.add(LSTM(512, input_shape=(X.shape[1], X.shape[2])))
             model.add(Dropout(0.2))
             model.add(Dense(y.shape[1], activation='softmax'))
             model.compile(loss='categorical_crossentropy', optimizer='adam')
@@ -108,7 +110,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
             model.save(dir_model)
             print "successfully trained and saved model"
         else:
-            print "couldnt find model. Train=0. Exiting."
+            print "couldnt find model and train=0. Exiting."
             return None
 
     # text generation
@@ -134,9 +136,9 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
 if __name__ == '__main__':
     n_songs= -1
     seq_length = 30
-    epochs = 6
+    epochs = 10
     
     dir_lyrics = 'playlists/country/'
-    dir_model = 'models/country.h5'
+    dir_model = 'models/country_letters.h5'
 
     main(dir_lyrics,dir_model,n_songs,seq_length,epochs)
