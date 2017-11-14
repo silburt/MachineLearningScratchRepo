@@ -1,4 +1,10 @@
 #https://github.com/vlraik/word-level-rnn-keras/blob/master/lstm_text_generation.py
+
+#force GPU - https://github.com/fchollet/keras/issues/4613
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 import numpy as np
 import glob
 import sys
