@@ -113,10 +113,9 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=0):
 
     # text generation
     seed = np.random.randint(0, n_songs)
-    pattern = songs[seed][0:seq_length]
-    print pattern
-    print "Seed:"
-    print "\"", ''.join([int_to_char[value] for value in pattern]), "\""
+    ini = songs[seed][0:seq_length]     #set initial = start of a song
+    pattern = [char_to_int[v] for v in list(ini)]
+    print "Seed: %s"%ini
     # generate characters
     for i in range(100):
         x = np.reshape(pattern, (1, len(pattern), 1))
