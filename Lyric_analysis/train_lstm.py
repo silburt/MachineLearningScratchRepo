@@ -1,9 +1,9 @@
 #https://github.com/vlraik/word-level-rnn-keras/blob/master/lstm_text_generation.py
 
 #force GPU - https://github.com/fchollet/keras/issues/4613
-import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+#import os
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import numpy as np
 import glob
@@ -92,7 +92,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
             dataX.append([char_to_int[char] for char in seq_in])
             dataY.append(char_to_int[seq_out])
     n_patterns = len(dataX)
-    print "Total Patterns: ", n_patterns
+    print("Total Patterns: ", n_patterns)
 
     # prepare
     X = np.reshape(dataX, (n_patterns,seq_length,1))    # reshape X:[samples,time steps,features]
@@ -101,10 +101,10 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
 
     try:
         model = load_model(dir_model)
-        print "successfully loaded model"
+        print("successfully loaded model")
     except:
         if train == 1:
-            print "couldnt find model. Training... (this will take a while)"
+            print("couldnt find model. Training... (this will take a while)")
             model = Sequential()
             model.add(LSTM(512, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
             model.add(Dropout(0.2))
@@ -115,17 +115,17 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
 
             model.fit(X, y, epochs=epochs, batch_size=128)
             model.save(dir_model)
-            print "successfully trained and saved model"
+            print("successfully trained and saved model")
         else:
-            print "couldnt find model and train=0. Exiting."
+            print("couldnt find model and train=0. Exiting.")
             return None
 
     # text generation
     seed = np.random.randint(0, n_songs)
     ini = songs[seed][0:seq_length]     #set initial = start of a song
     pattern = [char_to_int[v] for v in list(ini)]
-    print "Song:%s"%files[seed]
-    print "Seed:%s"%ini
+    print("Song:%s"%files[seed])
+    print("Seed:%s"%ini)
     # generate characters
     for i in range(100):
         x = np.reshape(pattern, (1, len(pattern), 1))
@@ -138,15 +138,15 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
         sys.stdout.write(result)
         pattern.append(index)
         pattern = pattern[1:len(pattern)]
-    print "\nDone."
+    print("\nDone.")
 
 if __name__ == '__main__':
-    n_songs= -1
+    n_songs= 10
     seq_length = 30
-    epochs = 10
+    epochs = 1
     
     dir_lyrics = 'playlists/country/'
-    dir_model = 'models/country_letters.h5'
+    dir_model = 'models/rubbish.h5'
 
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #is gpu device being used
     main(dir_lyrics,dir_model,n_songs,seq_length,epochs)
