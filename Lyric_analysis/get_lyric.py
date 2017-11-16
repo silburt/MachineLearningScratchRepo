@@ -24,12 +24,13 @@ def clean_names(artist, song):
     song = song.split('(')[0]       #exclude (feat. ) or other details
     song = song.split('-')[0]       #exclude extra details
     song = song.split('/')[0]       #exclude extra details
+    song = song.rstrip()
     ch = ['?','!']
     for c in ch:
         song = song.replace(c,'')
     return artist, song
 
-def get_lyrics(song_api_path):
+def extract_lyrics(song_api_path):
     song_url = base_url + song_api_path
     response = requests.get(song_url, headers=headers)
     json = response.json()
@@ -37,11 +38,10 @@ def get_lyrics(song_api_path):
     page_url = "http://genius.com" + path   #gotta go regular html scraping... come on Genius
     page = requests.get(page_url)
     html = BeautifulSoup(page.text, "html.parser")
-    [h.extract() for h in html('script')]   #remove script tags that they put in the middle of the lyrics
     lyrics = html.find("div", class_="lyrics").get_text() #updated css where the lyrics are based in HTML
     return lyrics.encode("utf-8")
 
-def get_song_api_path(artist, song):
+def get_song_lyrics(artist, song):
     artist, song = clean_names(artist, song)
     search_url = base_url + "/search"
     
@@ -49,23 +49,31 @@ def get_song_api_path(artist, song):
     response = requests.get(search_url, params={'q': song}, headers=headers)
     json = response.json()
     for hit in json["response"]["hits"]:
-        if hit["result"]["primary_artist"]["name"] == artist:
-            return hit["result"]["api_path"], artist, song
+        if artist in hit["result"]["primary_artist"]["name"].encode("utf-8"):
+            return extract_lyrics(hit["result"]["api_path"]), artist, song
 
     #try artist then song
     response = requests.get(search_url, params={'q': artist}, headers=headers)
     json = response.json()
     for hit in json["response"]["hits"]:
-        if hit["result"]["title"] == song:
-            return hit["result"]["api_path"], artist, song
+        if song in hit["result"]["title"].encode("utf-8"):
+            return extract_lyrics(hit["result"]["api_path"]), artist, song
 
-    print("Couldnt find: %s - %s"%(artist, song))
-    return None, artist, song
+    #last desperate attempt, except for edm this works most often...
+    try:
+        page_url = "http://genius.com/%s-%s-lyrics"%(artist.replace(' ','-'),song.replace(' ','-'))
+        page = requests.get(page_url)
+        html = BeautifulSoup(page.text, "html.parser")
+        lyrics = html.find("div", class_="lyrics").get_text() #updated css where the lyrics are based in HTML
+        return lyrics.encode("utf-8"), artist, song
+    except:
+        print("Couldnt find: %s - %s"%(artist, song))
+        return None, artist, song
 
 ###### Main Loop ######
 if __name__ == '__main__':
-#    song_name = "What You're Waiting For"
-#    artist_name = "Tiesto"
+#    song_name = "Coming Home"
+#    artist_name = "Seven Lions"
 #    song_api_path, artist, song = get_song_api_path(artist_name, song_name)
 #    lyrics = get_lyrics(song_api_path)
 #    print(lyrics)
@@ -77,11 +85,8 @@ if __name__ == '__main__':
     skipped_tracks = 0
     for index, track in tracks.iterrows():
         print(index)
-        song_api_path, artist, song = get_song_api_path(track['Artist Name'], track['Track Name'])
-        if song_api_path:
-            #get lyrics
-            lyrics = get_lyrics(song_api_path)
-            
+        lyrics, artist, song = get_song_lyrics(track['Artist Name'], track['Track Name'])
+        if lyrics:
             #write to txt file
             artist, song = artist.replace(' ','_').replace('/',''), song.replace(' ','_')
             with open('%s%s-%s.txt'%(dir,artist,song), 'w') as out:
