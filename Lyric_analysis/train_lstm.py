@@ -8,6 +8,7 @@
 import numpy as np
 import glob
 import sys
+import unidecode
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -21,6 +22,7 @@ import tensorflow as tf
 def unicodetoascii(text):
     TEXT = (text.
             replace('\xe2\x80\x99', "'").
+            replace('\x92',"'").
             replace('\xe2\x80\x8be', 'e').
             replace('\xc3\xa9', 'e').
             replace('\xc2\x92',"'").
@@ -51,15 +53,16 @@ def unicodetoascii(text):
             replace('\xe2\x81\xbe', ")").
             replace('\xe2\x80\x8b', '').
             replace('\xc3\xa2\xe2\x82\xac\xcb\x9c',"'").
-            replace('\xc3\xa0','a').
             replace('\xc3\xa4','a').
             replace('\xc3\xb1','n').
             replace('\xc3\xb3','o').
             replace('_',' ').
             replace('*',' ').
             replace('+','and').
-            replace('{','[').
-            replace('}',']').
+            replace('{','(').
+            replace('}',')').
+            replace('[','(').
+            replace(']',')').
             replace('`',"'").
             replace('"',"'").
             replace('$','').
@@ -69,8 +72,8 @@ def unicodetoascii(text):
     return TEXT
 
 def process_song(song_dir):
-    song = unicodetoascii(open(song_dir,'r').read().lower())
-    return song
+    song = open(song_dir,'r',encoding='utf-8').read().lower()
+    return unidecode.unidecode(unicodetoascii(song))
 
 def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
@@ -141,12 +144,14 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
     print("\nDone.")
 
 if __name__ == '__main__':
-    n_songs= 10
+    n_songs= -1
     seq_length = 30
-    epochs = 1
+    epochs = 6
     
-    dir_lyrics = 'playlists/country/'
-    dir_model = 'models/rubbish.h5'
+    #genre = sys.argv[1]
+    genre = 'country'
+    dir_lyrics = 'playlists/%s/'%genre
+    dir_model = 'models/%s.h5'%genre
 
-    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #is gpu device being used
+    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
     main(dir_lyrics,dir_model,n_songs,seq_length,epochs)
