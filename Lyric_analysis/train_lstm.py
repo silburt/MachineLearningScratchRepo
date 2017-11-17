@@ -115,8 +115,10 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
             model.add(Dropout(0.2))
             model.add(Dense(y.shape[1], activation='softmax'))
             model.compile(loss='categorical_crossentropy', optimizer='adam')
+            checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
+            callbacks_list = [checkpoint]
 
-            model.fit(X, y, epochs=epochs, batch_size=128)
+            model.fit(X, y, epochs=epochs, batch_size=128, callbacks=callbacks_list)
             model.save(dir_model)
             print("successfully trained and saved model")
         else:
