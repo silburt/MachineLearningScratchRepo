@@ -67,7 +67,6 @@ def get_song_lyrics(artist, song):
         lyrics = html.find("div", class_="lyrics").get_text() #updated css where the lyrics are based in HTML
         return lyrics.encode("utf-8"), artist, song
     except:
-        print("Couldnt find: %s - %s"%(artist, song))
         return None, artist, song
 
 ###### Main Loop ######
@@ -92,6 +91,7 @@ if __name__ == '__main__':
             with open('%s%s-%s.txt'%(dir,artist,song), 'w') as out:
                 out.write(lyrics)
         else:
+            print("Couldnt find: %s - %s"%(artist, song))
             skipped_tracks += 1
 
     n_tracks = len(tracks)

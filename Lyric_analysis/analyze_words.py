@@ -3,11 +3,27 @@
 # https://stackoverflow.com/questions/14364762/counting-n-gram-frequency-in-python-nltk
 
 from collections import Counter
+from itertools import combinations
 import nltk
 import numpy as np
 #nltk.download('punkt')
 import glob
 import matplotlib.pyplot as plt
+
+#improve the plotting spacing
+def update_max_pos(max_pos,max_pos_spacer,spacer=5):
+    if max_pos_spacer == 0:
+        return max_pos+spacer, 1
+    else:
+        return max_pos-spacer, 0
+
+#get lyrics and remove some useless characters
+def get_clean_lyric(f):
+    lyric = open(f,'r').read().lower()
+    lyric = lyric.replace(',','')
+    lyric = lyric.replace(';','')
+    lyric = lyric.replace('.','')
+    return lyric.split()
 
 #remove useless words
 def spam_filter(labels, counts):
@@ -32,6 +48,7 @@ def get_common_pairs(data, n_words, n_grams, max_pos):
     lbls2, cnt2 = spam_filter(lbls2, cnt2)
     
     pos1, pos2, counts1, counts2, labels, i = [], [], [], [], [], 0
+    max_pos_spacer = 0      #vary max_pos so that things don't overlap when plotted
     #for top matches from dir[0], find corresponding matches in dir[1]
     for i in range(n_words):
         l = lbls1[i]
@@ -39,9 +56,11 @@ def get_common_pairs(data, n_words, n_grams, max_pos):
             _c, _p = data[1][n_grams-1][l], lbls2.index(l)
             counts2.append(_c)
             pos2.append(min(_p,max_pos))
+            max_pos,max_pos_spacer = update_max_pos(max_pos,max_pos_spacer)
         except:
             counts2.append(0)
             pos2.append(max_pos)
+            max_pos,max_pos_spacer = update_max_pos(max_pos,max_pos_spacer)
         labels.append(l)
         pos1.append(i)
 
@@ -53,9 +72,11 @@ def get_common_pairs(data, n_words, n_grams, max_pos):
                 _c, _p = data[0][n_grams-1][l], lbls1.index(l)
                 counts1.append(_c)
                 pos1.append(min(_p,max_pos))
+                max_pos,max_pos_spacer = update_max_pos(max_pos,max_pos_spacer)
             except:
                 counts1.append(0)
                 pos1.append(max_pos)
+                max_pos,max_pos_spacer = update_max_pos(max_pos,max_pos_spacer)
             labels.append(l)
             pos2.append(i)
 
@@ -65,29 +86,32 @@ def get_common_pairs(data, n_words, n_grams, max_pos):
 ####### Main Functions ###########
 def get_stats(dir, norm, n_songs, print_=0):
     files = glob.glob('%s/*.txt'%dir)
-
-    np.random.seed(42)
-    seeds = np.random.randint(0,len(files),n_songs)
     
     cnt, bi_cnt, tri_cnt = Counter(), Counter(), Counter()
     words_per_song = 0
-    for s in seeds:
-        lyric = open(files[s],'r').read().lower().split()
-        bi_lyric=nltk.FreqDist(nltk.ngrams(lyric, 2))
-        tri_lyric=nltk.FreqDist(nltk.ngrams(lyric, 3))
-        
-        normalize = 1
-        n_words = len(lyric)
-        if norm == 1:
-            normalize = float(n_words*n_songs)
-        
-        words_per_song += float(n_words)/float(n_songs)
-        for l in lyric:
-            cnt[l] += 1/normalize
-        for b in bi_lyric:
-            bi_cnt[b] += 1/normalize
-        for t in tri_lyric:
-            tri_cnt[t] += 1/normalize
+    n_processed_songs = 0
+    for f in files:
+        lyric = get_clean_lyric(f)
+        if len(lyric) > 15: #ignore instrumentals
+            bi_lyric=nltk.FreqDist(nltk.ngrams(lyric, 2))
+            tri_lyric=nltk.FreqDist(nltk.ngrams(lyric, 3))
+            
+            normalize = 1
+            n_words = len(lyric)
+            if norm == 1:
+                normalize = float(n_words*n_songs)
+            
+            words_per_song += float(n_words)/float(n_songs)
+            for l in lyric:
+                cnt[l] += 1/normalize
+            for b in bi_lyric:
+                bi_cnt[b] += 1/normalize
+            for t in tri_lyric:
+                tri_cnt[t] += 1/normalize
+
+            n_processed_songs += 1
+        if n_processed_songs > n_songs:
+            break
 
     if print_ == 1:
         print "########%s########"%dir
@@ -104,8 +128,8 @@ def get_stats(dir, norm, n_songs, print_=0):
 
 ####### Arguments ###########
 if __name__ == '__main__':
-    dirs = ['playlists/rock','playlists/hip-hop', 'playlists/country', 'playlists/pop']
-    norm = 1
+    dirs = ['playlists/edm','playlists/hip-hop','playlists/rock', 'playlists/country', 'playlists/pop']
+    norm = 0
     n_songs = 800
     n_grams = 1
     n_common_words = 50
@@ -118,7 +142,7 @@ if __name__ == '__main__':
     #plot common pairs between genres
     plot_common = 1
     if plot_common == 1:
-        combos = [(0,1),(0,2),(0,3),(1,2),(1,3),(2,3)]
+        combos = list(combinations(range(len(dirs)),2))
         max_pos = 100
         for i1,i2 in combos:
             d = [data[i1],data[i2]]
@@ -129,8 +153,10 @@ if __name__ == '__main__':
             plt.plot(r_labels, 2*r_labels, 'g')
             plt.plot(2*r_labels, r_labels, 'g')
             plt.plot(pos[0], pos[1], '.')
+            line, = plt.plot([0,max_pos],[max_pos,max_pos], '--')
+            plt.plot([max_pos,max_pos],[0,max_pos], '--', color=line.get_color())
             for i in range(len(pos[0])):
-                plt.text(pos[0][i]+0.5, pos[1][i]+0.5, labels[i], size=8)
+                plt.text(pos[0][i]+0.5, pos[1][i]+0.5, labels[i], size=6)
             name1, name2 = dirs[i1].split('playlists/')[1], dirs[i2].split('playlists/')[1]
             plt.xlabel('%s rank'%name1)
             plt.ylabel('%s rank'%name2)
@@ -149,9 +175,10 @@ if __name__ == '__main__':
             labels, count = zip(*data[i][n_grams-1].most_common(n_common_words))
             labels, count = spam_filter(labels, count)
             x, name = range(len(count)), dirs[i].split('playlists/')[1]
-            plt.plot(x, count)
+            plt.plot(x, count, label='avg. words per song=%d'%data[i][3])
             plt.xticks(x, labels, rotation='vertical',fontsize=8)
             plt.ylabel(ylabel)
+            plt.legend(fontsize=8)
             plt.title(name)
             plt.savefig('images/worddist_%s.png'%name)
             plt.clf()
