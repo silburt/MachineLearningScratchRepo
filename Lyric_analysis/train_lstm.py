@@ -1,10 +1,5 @@
 #https://github.com/vlraik/word-level-rnn-keras/blob/master/lstm_text_generation.py
 
-#force GPU - https://github.com/fchollet/keras/issues/4613
-#import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
-
 import numpy as np
 import glob
 import sys
@@ -75,16 +70,22 @@ def process_song(song_dir):
     song = open(song_dir,'r',encoding='utf-8').read().lower()
     return unidecode.unidecode(unicodetoascii(song))
 
-def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
+def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=1):
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
     songs, n_songs = [], len(files)
     for i,f in enumerate(files):
         songs.append(process_song(f))
 
-    chars = sorted(list(set(' '.join(songs))))
-    n_chars = len(chars)
-    char_to_int = dict((c, i) for i, c in enumerate(chars))
-    int_to_char = dict((i, c) for i, c in enumerate(chars))
+    if word_or_character == 'word':
+        data = []
+        for song in songs:
+            data += song.split()
+    else:
+        data = sorted(list(set(' '.join(songs))))
+
+    n_chars = len(data)
+    char_to_int = dict((c, i) for i, c in enumerate(data))
+    int_to_char = dict((i, c) for i, c in enumerate(data))
 
     dataX, dataY = [], []
     for i in range(n_songs):
@@ -136,7 +137,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,train=1):
         x = np.reshape(pattern, (1, len(pattern), 1))
         x = x / float(n_chars)
         pred = model.predict(x, verbose=0)
-        #index = np.argmax(prediction)
+        #index = np.argmax(pred)
         index = np.random.choice(len(pred[0]), p=pred[0])
         result = int_to_char[index]
         seq_in = [int_to_char[value] for value in pattern]
@@ -149,11 +150,13 @@ if __name__ == '__main__':
     n_songs= -1
     seq_length = 30
     epochs = 6
+    word_or_character = 'character'
     
     #genre = sys.argv[1]
     genre = 'country'
     dir_lyrics = 'playlists/%s/'%genre
-    dir_model = 'models/%s.h5'%genre
+    #dir_model = 'models/%s_%s.h5'%(genre,word_or_character)
+    dir_model = 'models/%s_2.h5'%genre
 
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
-    main(dir_lyrics,dir_model,n_songs,seq_length,epochs)
+    main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character)
