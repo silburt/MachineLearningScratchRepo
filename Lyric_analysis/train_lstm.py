@@ -80,12 +80,16 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
         data = []
         for song in songs:
             data += song.split()
-    else:
+    elif word_or_character == 'character':
         data = sorted(list(set(' '.join(songs))))
+    else:
+        raise Exception('must choose word_or_character variable appropriately')
 
     n_chars = len(data)
     char_to_int = dict((c, i) for i, c in enumerate(data))
     int_to_char = dict((i, c) for i, c in enumerate(data))
+    print(int_to_char)
+    print(char_to_int)
 
     dataX, dataY = [], []
     for i in range(n_songs):
@@ -102,6 +106,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
     X = np.reshape(dataX, (n_patterns,seq_length,1))    # reshape X:[samples,time steps,features]
     X = X / float(n_chars)                              # normalize
     y = np_utils.to_categorical(dataY)                  # 1-hot encode the output variable
+    print(y.shape)
 
     try:
         model = load_model(dir_model)
@@ -119,7 +124,7 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
             checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
             callbacks_list = [checkpoint]
 
-            model.fit(X, y, epochs=epochs, batch_size=128, callbacks=callbacks_list)
+            model.fit(X, y, epochs=epochs, batch_size=128, validation_split=0.2, callbacks=callbacks_list)
             model.save(dir_model)
             print("successfully trained and saved model")
         else:
@@ -148,15 +153,14 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
 
 if __name__ == '__main__':
     n_songs= -1
-    seq_length = 30
-    epochs = 6
+    seq_length = 200
+    epochs = 10
     word_or_character = 'character'
     
     #genre = sys.argv[1]
     genre = 'country'
     dir_lyrics = 'playlists/%s/'%genre
-    #dir_model = 'models/%s_%s.h5'%(genre,word_or_character)
-    dir_model = 'models/%s_2.h5'%genre
+    dir_model = 'models/%s_sl%d.h5'%(genre,seq_length)
 
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
     main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character)
