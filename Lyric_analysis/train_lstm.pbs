@@ -1,4 +1,4 @@
-#!/bin/bash#PBS -l nodes=1:gpus=1 #PBS -l walltime=48:00:00 #PBS -l pmem=6gb 				## Requests 6 gigabytes of memory per process#PBS -A cyberlamp -l qos=cl_open  		## Specifies the allocation. Use –A open for open queue#PBS -j oe 					## Requests that regular output and terminal output go to the same filecd $PBS_O_WORKDIR
+#!/bin/bash#PBS -l nodes=1:gpus=1 #PBS -l walltime=48:00:00 #PBS -l pmem=8gb 				## Requests 6 gigabytes of memory per process#PBS -A cyberlamp -l qos=cl_open  		## Specifies the allocation. Use –A open for open queue#PBS -j oe 					## Requests that regular output and terminal output go to the same filecd $PBS_O_WORKDIR
 module load python/3.3.2
 export PATH="/storage/work/ajs725/conda/install/bin:$PATH"
-CUDA_VISIBLE_DEVICES=0 python train_lstm_strip.py > strip.txt
+CUDA_VISIBLE_DEVICES=0 python train_lstm.py > long.txt
