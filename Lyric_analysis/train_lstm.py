@@ -14,89 +14,41 @@ from keras.utils import np_utils
 from keras.models import load_model
 import tensorflow as tf
 
-def unicodetoascii(text):
-    TEXT = (text.
-            replace('\xe2\x80\x99', "'").
-            replace('\x92',"'").
-            replace('\xe2\x80\x8be', 'e').
-            replace('\xc3\xa9', 'e').
-            replace('\xc2\x92',"'").
-            replace('\xe2\x80\x90', '-').
-            replace('\xe2\x80\x91', '-').
-            replace('\xe2\x80\x92', '-').
-            replace('\xe2\x80\x93', '-').
-            replace('\xe2\x80\x94', '-').
-            replace('\xe2\x80\x94', '-').
-            replace('\xe2\x80\x98', "'").
-            replace('\xe2\x80\x9b', "'").
-            replace('\xe2\x80\x9c', '"').
-            replace('\xe2\x80\x9c', '"').
-            replace('\xe2\x80\x9d', '"').
-            replace('\xe2\x80\x9e', '"').
-            replace('\xe2\x80\x9f', '"').
-            replace('\xe2\x80\xa6', '...').
-            replace('\xe2\x80\xb2', "'").
-            replace('\xe2\x80\xb3', "'").
-            replace('\xe2\x80\xb4', "'").
-            replace('\xe2\x80\xb5', "'").
-            replace('\xe2\x80\xb6', "'").
-            replace('\xe2\x80\xb7', "'").
-            replace('\xe2\x81\xba', "+").
-            replace('\xe2\x81\xbb', "-").
-            replace('\xe2\x81\xbc', "=").
-            replace('\xe2\x81\xbd', "(").
-            replace('\xe2\x81\xbe', ")").
-            replace('\xe2\x80\x8b', '').
-            replace('\xc3\xa2\xe2\x82\xac\xcb\x9c',"'").
-            replace('\xc3\xa4','a').
-            replace('\xc3\xb1','n').
-            replace('\xc3\xb3','o').
-            replace('_',' ').
-            replace('*',' ').
-            replace('+','and').
-            replace('{','(').
-            replace('}',')').
-            replace('[','(').
-            replace(']',')').
-            replace('`',"'").
-            replace('"',"'").
-            replace('$','').
-            replace('&','and').
-            replace('/',' and ')
-            )
-    return TEXT
+from clean_lyrics import *
 
-def process_song(song_dir):
+def process_song(song_dir, word_or_character):
     song = open(song_dir,'r',encoding='utf-8').read().lower()
-    return unidecode.unidecode(unicodetoascii(song))
+    song = unidecode.unidecode(unicodetoascii(song, word_or_character))
+    if word_or_character == 'word':
+        return song.split()
+    return song
 
-def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=1):
+def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=0):
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
     songs, n_songs = [], len(files)
     for i,f in enumerate(files):
-        songs.append(process_song(f))
+        songs.append(process_song(f, word_or_character))
 
-    if word_or_character == 'word':
-        data = []
-        for song in songs:
-            data += song.split()
-    elif word_or_character == 'character':
+    if word_or_character == 'character':
         data = sorted(list(set(' '.join(songs))))
-    else:
-        raise Exception('must choose word_or_character variable appropriately')
+    elif word_or_character == 'word':
+        data = []
+        for s in songs:
+            data += s
 
     n_chars = len(data)
     char_to_int = dict((c, i) for i, c in enumerate(data))
     int_to_char = dict((i, c) for i, c in enumerate(data))
-    print(int_to_char)
-    print(char_to_int)
+#    print(int_to_char)
+#    print(char_to_int)
 
     dataX, dataY = [], []
     for i in range(n_songs):
-        song_text = songs[i]
-        for j in range(0,len(song_text)-seq_length, 1):
-            seq_in = song_text[j:j + seq_length]
-            seq_out = song_text[j + seq_length]
+        lyric = songs[i]
+        for j in range(0,len(lyric)-seq_length, 1):
+            seq_in = lyric[j:j + seq_length]
+            seq_out = lyric[j + seq_length]
+            print(seq_in, seq_out)
             dataX.append([char_to_int[char] for char in seq_in])
             dataY.append(char_to_int[seq_out])
     n_patterns = len(dataX)
@@ -152,15 +104,15 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
     print("\nDone.")
 
 if __name__ == '__main__':
-    n_songs= -1
-    seq_length = 200
+    n_songs= 2
+    seq_length = 10
     epochs = 10
-    word_or_character = 'character'
+    word_or_character = 'word'
     
     #genre = sys.argv[1]
     genre = 'country'
     dir_lyrics = 'playlists/%s/'%genre
-    dir_model = 'models/%s_sl%d.h5'%(genre,seq_length)
+    dir_model = 'models/%s_sl%d_%s.h5'%(genre,seq_length,word_or_character)
 
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
     main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character)
