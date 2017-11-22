@@ -11,8 +11,8 @@ import tensorflow as tf
 def train_model(genre,dir_model,epochs,seq_length):
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
     
-    X = np.load('%sX_sl%d.npy'%(dir_lyrics,seq_length))
-    y = np.load('%sy_sl%d.npy'%(dir_lyrics,seq_length))
+    X = np.load('playlists/%s/X_sl%d.npy'%(genre,seq_length))
+    y = np.load('playlists/%s/y_sl%d.npy'%(genre,seq_length))
     
     model = Sequential()
     model.add(LSTM(512, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))

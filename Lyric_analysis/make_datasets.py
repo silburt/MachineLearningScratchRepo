@@ -14,7 +14,8 @@ def process_song(song_dir, word_or_character):
         return song.split()
     return song
 
-def main(dir_lyrics,n_songs,seq_length,word_or_character):
+def main(genre,n_songs,seq_length,word_or_character):
+    dir_lyrics = 'playlists/%s/'%genre
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
     songs, n_songs = [], len(files)
     for i,f in enumerate(files):
@@ -82,6 +83,5 @@ if __name__ == '__main__':
     
     #genre = sys.argv[1]
     genre = 'country'
-    dir_lyrics = 'playlists/%s/'%genre
 
-    main(dir_lyrics,n_songs,seq_length,word_or_character)
+    main(genre,n_songs,seq_length,word_or_character)
