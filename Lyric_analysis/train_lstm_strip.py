@@ -11,9 +11,8 @@ import tensorflow as tf
 if __name__ == '__main__':
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
 
-    X, y = np.load('X.npy'), np.load('y')
+    X, y = np.load('X.npy'), np.load('y.npy')
 
-    print("couldnt find model. Training... (this will take a while)")
     model = Sequential()
     model.add(LSTM(512, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
     model.add(Dropout(0.2))
