@@ -12,6 +12,8 @@ if __name__ == '__main__':
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
 
     X, y = np.load('X.npy'), np.load('y.npy')
+    dir_model = 'model.h5'
+    epochs = 6
 
     model = Sequential()
     model.add(LSTM(512, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
@@ -24,4 +26,4 @@ if __name__ == '__main__':
     callbacks_list = [checkpoint]
 
     model.fit(X, y, epochs=epochs, batch_size=128, validation_split=0.2, callbacks=callbacks_list)
-    model.save('model.h5')
+    model.save(dir_model)

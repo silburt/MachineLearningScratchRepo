@@ -60,6 +60,11 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
     y = np_utils.to_categorical(dataY)                  # 1-hot encode the output variable
     print(y.shape)
 
+    save = 1
+    if save == 1:
+        np.save('X.npy',X)
+        np.save('y.npy',y)
+
     try:
         model = load_model(dir_model)
         print("successfully loaded model")
@@ -104,10 +109,10 @@ def main(dir_lyrics,dir_model,n_songs,seq_length,epochs,word_or_character,train=
     print("\nDone.")
 
 if __name__ == '__main__':
-    n_songs= 2
-    seq_length = 10
-    epochs = 10
-    word_or_character = 'word'
+    n_songs = 200
+    seq_length = 35
+    epochs = 1
+    word_or_character = 'character'
     
     #genre = sys.argv[1]
     genre = 'country'
