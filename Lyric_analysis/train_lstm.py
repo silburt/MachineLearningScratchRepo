@@ -5,7 +5,6 @@ from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
-from keras.models import load_model
 import tensorflow as tf
 
 def train_model(genre,dir_model,epochs,seq_length):

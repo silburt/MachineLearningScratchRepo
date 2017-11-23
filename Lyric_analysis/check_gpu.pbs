@@ -1,2 +1,0 @@
-#!/bin/bash#PBS -l nodes=1:gpus=1 #PBS -l walltime=1:00:00 #PBS -l pmem=6gb 				## Requests 6 gigabytes of memory per process#PBS -A cyberlamp -l qos=cl_open  		## Specifies the allocation. Use –A open for open queue#PBS -j oe 					## Requests that regular output and terminal output go to the same filecd $PBS_O_WORKDIR
-python check_gpu.py > check_gpu.txt
