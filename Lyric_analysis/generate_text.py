@@ -14,14 +14,14 @@ def gen(genre,dir_model,seq_length):
     #ini = songs[seed][0:seq_length]     #set initial = start of a song
     ini = X[0]
     pattern = [int(v*n_chars) for v in list(ini)]
-    print([int_to_char[value] for value in pattern])
+    print(''.join([int_to_char[value] for value in pattern]))
     # generate characters
     for i in range(200):
         x = np.reshape(pattern, (1, len(pattern), 1))
         x = x / float(n_chars)
         pred = model.predict(x, verbose=0)
-        #index = np.argmax(pred)
-        index = np.random.choice(len(pred[0]), p=pred[0])
+        index = np.argmax(pred)
+        #index = np.random.choice(len(pred[0]), p=pred[0])
         result = int_to_char[index]
         #seq_in = [int_to_char[value] for value in pattern]
         sys.stdout.write(result)
