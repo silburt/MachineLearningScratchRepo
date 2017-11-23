@@ -13,8 +13,9 @@ def gen(genre,dir_model,seq_length):
     
     #seed = np.random.randint(0, n_songs)
     #ini = songs[seed][0:seq_length]     #set initial = start of a song
+    ini = X[0]
     pattern = [char_to_int[v] for v in list(ini)]
-    print("Song:%s"%files[seed])
+#    print("Song:%s"%files[seed])
     print("Seed:%s"%ini)
     # generate characters
     for i in range(100):
