@@ -23,14 +23,14 @@ def train_model(genre,dir_model,epochs,seq_length):
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
     
-    model.fit(X, y, epochs=epochs, batch_size=128, validation_split=0.2, callbacks=callbacks_list)
+    model.fit(X, y, epochs=epochs, batch_size=128, callbacks=callbacks_list)#, validation_split=0.2)
     model.save(dir_model)
 
 if __name__ == '__main__':
     genre = 'country'
     seq_length = 200
     epochs = 60
-    dir_model = 'models/%s.h5'%genre
+    dir_model = 'models/%s_2.h5'%genre
     
     train_model(genre,dir_model,epochs,seq_length)
 

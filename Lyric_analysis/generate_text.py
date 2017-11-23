@@ -8,7 +8,7 @@ def gen(genre,dir_model,seq_length):
     
     model = load_model(dir_model)
     X = np.load('%s/X_sl%d_2.npy'%(dir_lyrics,seq_length))
-    char_to_int, int_to_char, n_chars = np.load('%sancilary_2.npy'%dir_lyrics)
+    char_to_int, int_to_char, n_chars = np.load('%sancillary_2.npy'%dir_lyrics)
     
     #seed = np.random.randint(0, n_songs)
     #ini = songs[seed][0:seq_length]     #set initial = start of a song
