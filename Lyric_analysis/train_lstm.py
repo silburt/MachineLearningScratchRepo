@@ -30,7 +30,7 @@ if __name__ == '__main__':
     genre = 'country'
     seq_length = 200
     epochs = 60
-    dir_model = 'models/%s_2.h5'%genre
+    dir_model = 'models/%s_novalid.h5'%genre
     
     train_model(genre,dir_model,epochs,seq_length)
 
