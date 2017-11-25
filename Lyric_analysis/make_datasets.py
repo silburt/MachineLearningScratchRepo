@@ -3,16 +3,8 @@
 import numpy as np
 import glob
 import sys
-import unidecode
 from keras.utils import np_utils
-from clean_lyrics import *
-
-def process_song(song_dir, word_or_character):
-    song = open(song_dir,'r',encoding='utf-8').read().lower()
-    song = unidecode.unidecode(unicodetoascii(song, word_or_character))
-    if word_or_character == 'word':
-        return song.split()
-    return song
+from process_lyrics import *
 
 def main(genre,n_songs,seq_length,word_or_character):
     dir_lyrics = 'playlists/%s/'%genre

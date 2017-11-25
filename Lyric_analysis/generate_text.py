@@ -1,6 +1,7 @@
 import numpy as np
 import sys, glob
 from keras.models import load_model
+from process_lyrics import *
 
 # text generation
 def gen(genre,dir_model,seq_length):
@@ -11,12 +12,16 @@ def gen(genre,dir_model,seq_length):
     
     #generate initial seed
     #ini = np.load('%s/X_sl%d.npy'%(dir_lyrics,seq_length))[0]
-    songs = glob.glob('playlists/%s/*.txt'%genre)
-    seed = np.random.randint(0, len(songs))
-    ini = songs[seed][0:seq_length]     #set initial = start of a song
+    #pattern = [int(c*n_chars) for c in list(ini)]
     
-    pattern = [int(v*n_chars) for v in list(ini)]
-    print(''.join([int_to_char[value] for value in pattern]))
+    #generate initial seed
+    songs = glob.glob('%s/*.txt'%dir_lyrics)
+    seed = np.random.randint(0, len(songs))
+    ini = list(process_song(songs[seed],'character')[:seq_length])
+    pattern = [char_to_int[c] for c in list(ini)]
+    print(songs[seed])
+    print(''.join([int_to_char[c] for c in pattern]))
+    
     # generate characters
     for i in range(200):
         x = np.reshape(pattern, (1, len(pattern), 1))
@@ -34,6 +39,6 @@ def gen(genre,dir_model,seq_length):
 if __name__ == '__main__':
     genre = 'country'
     seq_length = 200
-    dir_model = 'models/%s_novalid.h5'%genre
+    dir_model = 'models/%s_novalid_lstm1024.h5'%genre
 
     gen(genre,dir_model,seq_length)
