@@ -8,9 +8,11 @@ def gen(genre,dir_model,seq_length):
     
     model = load_model(dir_model)
     char_to_int, int_to_char, n_chars = np.load('%sancillary.npy'%dir_lyrics)
+    
+    #generate initial seed
     #ini = np.load('%s/X_sl%d.npy'%(dir_lyrics,seq_length))[0]
     songs = glob.glob('playlists/%s/*.txt'%genre)
-    seed = np.random.randint(0, n_songs)
+    seed = np.random.randint(0, len(songs))
     ini = songs[seed][0:seq_length]     #set initial = start of a song
     
     pattern = [int(v*n_chars) for v in list(ini)]
