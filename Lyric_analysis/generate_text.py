@@ -21,14 +21,15 @@ def gen(genre,dir_model,seq_length):
     pattern = [char_to_int[c] for c in list(ini)]
     print(songs[seed])
     print(''.join([int_to_char[c] for c in pattern]))
+    print("*****")
     
     # generate characters
     for i in range(200):
         x = np.reshape(pattern, (1, len(pattern), 1))
         x = x / float(n_chars)
         pred = model.predict(x, verbose=0)
-        index = np.argmax(pred)
-        #index = np.random.choice(len(pred[0]), p=pred[0])
+        #index = np.argmax(pred)
+        index = np.random.choice(len(pred[0]), p=pred[0])
         result = int_to_char[index]
         #seq_in = [int_to_char[value] for value in pattern]
         sys.stdout.write(result)
@@ -39,6 +40,6 @@ def gen(genre,dir_model,seq_length):
 if __name__ == '__main__':
     genre = 'country'
     seq_length = 200
-    dir_model = 'models/%s_novalid_lstm1024.h5'%genre
+    dir_model = 'models/%s_novalid.h5'%genre
 
     gen(genre,dir_model,seq_length)
