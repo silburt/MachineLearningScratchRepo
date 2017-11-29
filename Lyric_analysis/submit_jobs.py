@@ -3,7 +3,7 @@ import numpy as np
 
 seq_length = [25,50,75,100,125,150,175,200]
 
-submit_jobs = 0
+submit_jobs = 1
 jobs_dir = 'jobs'
 counter = 0
 for sl in seq_length:
@@ -23,6 +23,6 @@ for sl in seq_length:
 
     if submit_jobs == 1:
         os.system('mv %s/%s %s'%(jobs_dir,job_name, job_name))
-        os.system('qsub %s'%pbs_script_name)
+        os.system('qsub %s'%job_name)
         os.system('mv %s %s/%s'%(job_name,jobs_dir,job_name))
         counter += 1
