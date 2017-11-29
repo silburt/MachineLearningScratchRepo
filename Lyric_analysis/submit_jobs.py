@@ -3,7 +3,7 @@ import numpy as np
 
 seq_length = [25,50,75,100,125,150,175,200]
 
-submit_jobs = 1
+submit_jobs = 0
 jobs_dir = 'jobs'
 counter = 0
 for sl in seq_length:
@@ -17,8 +17,8 @@ for sl in seq_length:
         f.write('#PBS -j oe\n')
         f.write('cd $PBS_O_WORKDIR\n')
         f.write('module load python/3.3.2\n')
-        f.write('export PATH="/storage/work/ajs725/conda/install/bin:$PATH"\n')
-        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d > long_novalid2.txt'%sl)
+        f.write('export PATH="/storage/work/ajs725/conda/install/bin:$PATH"\n\n')
+        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d > sl%d.txt'%(sl,sl))
     f.close()
 
     if submit_jobs == 1:

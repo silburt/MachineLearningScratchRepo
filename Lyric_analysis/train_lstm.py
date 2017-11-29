@@ -39,7 +39,7 @@ if __name__ == '__main__':
     #seq_length = 200
     seq_length = int(sys.argv[1])
     epochs = 40
-    dir_model = 'models/%s_sl%d.h5'%genre
+    dir_model = 'models/%s_sl%d.h5'%(genre,seq_length)
     
     train_model(genre,dir_model,epochs,seq_length)
 
