@@ -45,14 +45,15 @@ def main(genre,n_songs,seq_length,word_or_character):
     # save data
     np.save('%sX_sl%d.npy'%(dir_lyrics,seq_length),X)
     np.save('%sy_sl%d.npy'%(dir_lyrics,seq_length),y)
-    np.save('%sancillary.npy'%dir_lyrics,[char_to_int,int_to_char,n_chars])
+    np.save('%sancillary_sl%d.npy'%dir_lyrics,[char_to_int,int_to_char,n_chars])
 
 if __name__ == '__main__':
     n_songs = -1
-    seq_length = 200
+    seq_length = [25,50,75,100,125,150,175,200]
     word_or_character = 'character'
     
     #genre = sys.argv[1]
     genre = 'country'
 
-    main(genre,n_songs,seq_length,word_or_character)
+    for sl in seq_length:
+        main(genre,n_songs,sl,word_or_character)

@@ -7,6 +7,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 from keras.models import load_model
 import tensorflow as tf
+import sys
 
 def train_model(genre,dir_model,epochs,seq_length):
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
@@ -30,14 +31,15 @@ def train_model(genre,dir_model,epochs,seq_length):
     print(model.summary())
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
-    model.fit(X, y, epochs=epochs, batch_size=128, callbacks=callbacks_list)#, validation_split=0.2)
+    model.fit(X, y, epochs=epochs, batch_size=128, callbacks=callbacks_list, validation_split=0.2)
     model.save(dir_model)
 
 if __name__ == '__main__':
     genre = 'country'
-    seq_length = 200
+    #seq_length = 200
+    seq_length = int(sys.argv[1])
     epochs = 40
-    dir_model = 'models/%s_novalid.h5'%genre
+    dir_model = 'models/%s_sl%d.h5'%genre
     
     train_model(genre,dir_model,epochs,seq_length)
 
