@@ -45,7 +45,7 @@ def main(genre,n_songs,seq_length,word_or_character):
     # save data
     np.save('%sX_sl%d.npy'%(dir_lyrics,seq_length),X)
     np.save('%sy_sl%d.npy'%(dir_lyrics,seq_length),y)
-    np.save('%sancillary_sl%d.npy'%dir_lyrics,[char_to_int,int_to_char,n_chars])
+    np.save('%sancillary_sl%d.npy'%(dir_lyrics,seq_length),[char_to_int,int_to_char,n_chars])
 
 if __name__ == '__main__':
     n_songs = -1
