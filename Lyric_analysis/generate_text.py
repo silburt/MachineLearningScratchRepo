@@ -39,7 +39,9 @@ def gen(genre,dir_model,seq_length):
 
 if __name__ == '__main__':
     genre = 'country'
-    seq_length = 200
-    dir_model = 'models/%s_novalid.h5'%genre
-
-    gen(genre,dir_model,seq_length)
+    seq_lengths = [25,50,75,100,125,150,175,200]
+    
+    for seq_length in seq_lengths:
+        print('***********seq_length=%d***********'%seq_length)
+        dir_model = 'models/%s_novalid.h5'%genre
+        gen(genre,dir_model,seq_length)
