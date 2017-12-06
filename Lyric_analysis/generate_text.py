@@ -8,7 +8,7 @@ def gen(genre,dir_model,seq_length):
     dir_lyrics = 'playlists/%s/'%genre
     
     model = load_model(dir_model)
-    char_to_int, int_to_char, n_chars = np.load('%sancillary.npy'%dir_lyrics)
+    char_to_int, int_to_char, n_chars = np.load('%sancillary_sl%d.npy'%(dir_lyrics,seq_length))
     
     #generate initial seed
     #ini = np.load('%s/X_sl%d.npy'%(dir_lyrics,seq_length))[0]
@@ -24,7 +24,7 @@ def gen(genre,dir_model,seq_length):
     print("*****")
     
     # generate characters
-    for i in range(200):
+    for i in range(300):
         x = np.reshape(pattern, (1, len(pattern), 1))
         x = x / float(n_chars)
         pred = model.predict(x, verbose=0)
