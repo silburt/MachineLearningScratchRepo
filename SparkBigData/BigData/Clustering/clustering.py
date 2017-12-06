@@ -2,6 +2,16 @@
 You can execute this script (in Python 3) by doing:
 pyspark
 exec(open("clustering.py").read())
+
+or
+
+you can do:
+from pyspark import SparkConf, SparkContext
+conf = SparkConf().setMaster("local").setAppName("Test_App")
+sc = SparkContext(conf = conf)
+
+and then call the script in the terminal by:
+spark-submit clustering.py
 '''
 
 rdd1 = sc.textFile("5000_points.txt")
