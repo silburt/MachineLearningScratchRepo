@@ -43,5 +43,5 @@ if __name__ == '__main__':
     
     for seq_length in seq_lengths:
         print('***********seq_length=%d***********'%seq_length)
-        dir_model = 'models/%s_novalid.h5'%genre
+        dir_model = 'models/%s_sl%d.h5'%(genre,seq_length)
         gen(genre,dir_model,seq_length)
