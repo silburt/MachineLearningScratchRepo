@@ -1,4 +1,5 @@
 import unidecode
+import re
 
 def unicodetoascii(text, word_or_character):
     if word_or_character == 'character':
@@ -49,6 +50,9 @@ def unicodetoascii(text, word_or_character):
                 replace('"',"'").
                 replace('$','').
                 replace('&','and').
+                replace('#','number ').
+                replace('%', 'percent').
+                replace('\n\n','\n').
                 replace('/',' and ')
                 )
         return TEXT
@@ -59,6 +63,7 @@ def unicodetoascii(text, word_or_character):
 def process_song(song_dir, word_or_character='character'):
     song = open(song_dir,'r',encoding='utf-8').read().lower()
     song = unidecode.unidecode(unicodetoascii(song, word_or_character))
+    song = re.sub("[\(\[].*?[\)\]]", "", song)
     if word_or_character == 'word':
         return song.split()
     return song
