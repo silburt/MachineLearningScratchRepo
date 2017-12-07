@@ -1,3 +1,6 @@
+# https://wikispaces.psu.edu/display/CyberLAMP/System+Information
+# In general 1 GPU per node.
+
 import os
 import numpy as np
 
@@ -12,7 +15,7 @@ for sl in seq_length:
         f.write('#!/bin/bash\n')
         f.write('#PBS -l nodes=1:gpus=1\n')
         f.write('#PBS -l walltime=48:00:00\n')
-        f.write('#PBS -l pmem=8gb\n')
+        f.write('#PBS -l pmem=12gb\n')
         f.write('#PBS -A cyberlamp -l qos=cl_open\n')
         f.write('#PBS -j oe\n')
         f.write('cd $PBS_O_WORKDIR\n')

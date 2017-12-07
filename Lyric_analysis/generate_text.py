@@ -21,7 +21,7 @@ def gen(genre,dir_model,seq_length):
     pattern = [char_to_int[c] for c in list(ini)]
     print(songs[seed])
     print(''.join([int_to_char[c] for c in pattern]))
-    print("*****")
+    print("****predicted lyrics:****")
     
     # generate characters
     for i in range(300):
@@ -38,7 +38,7 @@ def gen(genre,dir_model,seq_length):
     print("\nDone.")
 
 if __name__ == '__main__':
-    genre = 'country'
+    genre = 'pop-rock-edm'
     seq_lengths = [25,50,75,100,125,150,175,200]
     
     for seq_length in seq_lengths:
