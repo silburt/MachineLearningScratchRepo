@@ -18,7 +18,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size):
     
     try:
         model = load_model(dir_model)
-        print("successfully loaded previous model")
+        print("successfully loaded previous model, continuing to train")
     except:
         print("generating new model")
         model = Sequential()
