@@ -55,10 +55,13 @@ def unicodetoascii(text, word_or_character):
                 replace('\n\n','\n').
                 replace('/',' and ')
                 )
-        return TEXT
     
     elif word_or_character == 'word':
-        return None
+        TEXT = (text.replace(',','').
+                replace('.','').
+                replace(';','')
+                )
+    return TEXT
 
 def process_song(song_dir, word_or_character='character'):
     song = open(song_dir,'r',encoding='utf-8').read().lower()

@@ -71,11 +71,6 @@ def get_song_lyrics(artist, song):
 
 ###### Main Loop ######
 if __name__ == '__main__':
-#    song_name = "Coming Home"
-#    artist_name = "Seven Lions"
-#    song_api_path, artist, song = get_song_api_path(artist_name, song_name)
-#    lyrics = get_lyrics(song_api_path)
-#    print(lyrics)
 
     dir = 'playlists/edm/'
     tracks = pd.read_csv(glob.glob('%s*.csv'%dir)[0])

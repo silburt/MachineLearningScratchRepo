@@ -34,7 +34,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size):
     print(model.summary())
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
-    model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks_list, validation_split=0.2)
+    model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks_list, validation_split=0.2, verbose=2)
     model.save(dir_model)
 
 if __name__ == '__main__':
