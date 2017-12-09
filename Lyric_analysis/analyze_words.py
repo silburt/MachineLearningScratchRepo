@@ -94,7 +94,7 @@ if __name__ == '__main__':
         for i1,i2 in combos:
             master_labels, pos1, pos2  = [], [], []
             master_labels, pos1, pos2 = get_common_pairs(data[0][n_grams-1], pos1, data[1][n_grams-1], pos2, master_labels, n_common_words, pad)
-            master_labels, pos1, pos2 = get_common_pairs(data[1][n_grams-1], pos2, data[0][n_grams-1], pos1, master_labels, n_common_words, pad)
+            master_labels, pos2, pos1 = get_common_pairs(data[1][n_grams-1], pos2, data[0][n_grams-1], pos1, master_labels, n_common_words, pad)
             pos = [pos1, pos2]
             
             #plot prep
