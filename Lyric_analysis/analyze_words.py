@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from process_lyrics import *
 np.random.seed(12)
 
-def get_common_pairs(cnt1, pos1, cnt2, pos2, master_labels, n_words, pad):
+def get_word_ranks(cnt1, pos1, cnt2, pos2, master_labels, n_words, pad):
     labels1, count1 = zip(*cnt1.most_common(10*n_words))
     labels2, count2 = zip(*cnt2.most_common(10*n_words))
     for i in range(n_words):
@@ -74,8 +74,8 @@ def get_stats(dir, norm, n_songs, print_=0):
 
 ####### Arguments ###########
 if __name__ == '__main__':
-    #dirs = ['playlists/edm','playlists/hip-hop','playlists/rock', 'playlists/country', 'playlists/pop']
-    dirs = ['playlists/edm','playlists/pop']
+    dirs = ['playlists/edm','playlists/hip-hop','playlists/rock', 'playlists/country', 'playlists/pop']
+    #dirs = ['playlists/edm','playlists/pop']
     norm = 0
     n_songs = 996
     n_grams = 1
@@ -93,8 +93,8 @@ if __name__ == '__main__':
         pad = 20
         for i1,i2 in combos:
             master_labels, pos1, pos2  = [], [], []
-            master_labels, pos1, pos2 = get_common_pairs(data[0][n_grams-1], pos1, data[1][n_grams-1], pos2, master_labels, n_common_words, pad)
-            master_labels, pos2, pos1 = get_common_pairs(data[1][n_grams-1], pos2, data[0][n_grams-1], pos1, master_labels, n_common_words, pad)
+            master_labels, pos1, pos2 = get_word_ranks(data[0][n_grams-1], pos1, data[1][n_grams-1], pos2, master_labels, n_common_words, pad)
+            master_labels, pos2, pos1 = get_word_ranks(data[1][n_grams-1], pos2, data[0][n_grams-1], pos1, master_labels, n_common_words, pad)
             pos = [pos1, pos2]
             
             #plot prep
