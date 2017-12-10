@@ -166,12 +166,12 @@ if __name__ == '__main__':
                         ranks_ = np.append(ranks_,index)
                         counts_ = np.append(counts_,counts[k][index])
                     except:
-                        ranks_ = np.append(ranks_,2*n_common_words)
+                        ranks_ = np.append(ranks_,10*n_common_words)
                         counts_ = np.append(counts_,0)
                 if len(np.where(1.5*j + 2 < ranks_)[0]) == len(ranks_)-1:
                     unique_words[i].append(label)
-#                if label in ['work','she','sun','heart']:
-#                    print(label,ranks_,counts_)
+                if label in ['sun']:
+                    print(label,ranks_,counts_)
                 if (len(np.where(np.max(ranks_)/1.5 - 2 < ranks_)[0]) == 1) and (len(np.where(np.min(counts_)*1.5 + 3 > counts_)[0]) == 1):
                     if label not in cold_words[np.argmax(ranks_)]:
                         cold_words[np.argmax(ranks_)].append(label)
