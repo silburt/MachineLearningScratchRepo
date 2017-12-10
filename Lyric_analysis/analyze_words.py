@@ -19,10 +19,10 @@ def get_word_ranks(cnt1, pos1, cnt2, pos2, master_labels, n_words, pad):
         l = labels1[i]
         if l not in master_labels[0:n_words]:
             try:
-                _c, _p = cnt2[l], labels2.index(l)
-                pos2.append(min(_p,(pad-3)*np.random.random()+n_words+1))
+                _c, _r = cnt2[l], labels2.index(l)
+                pos2.append(min(_r,n_words))
             except:
-                pos2.append((pad-3)*np.random.random()+n_words+1)
+                pos2.append(n_words)
             master_labels.append(l)
             pos1.append(i)
     return master_labels, pos1, pos2
@@ -90,28 +90,32 @@ if __name__ == '__main__':
     plot_common = 1
     if plot_common == 1:
         combos = list(combinations(range(len(dirs)),2))
-        pad = 20
+        pad = 8
         for i1,i2 in combos:
             master_labels, pos1, pos2  = [], [], []
-            master_labels, pos1, pos2 = get_word_ranks(data[0][n_grams-1], pos1, data[1][n_grams-1], pos2, master_labels, n_common_words, pad)
-            master_labels, pos2, pos1 = get_word_ranks(data[1][n_grams-1], pos2, data[0][n_grams-1], pos1, master_labels, n_common_words, pad)
-            pos = [pos1, pos2]
+            master_labels, pos1, pos2 = get_word_ranks(data[i1][n_grams-1], pos1, data[i2][n_grams-1], pos2, master_labels, n_common_words, pad)
+            master_labels, pos2, pos1 = get_word_ranks(data[i2][n_grams-1], pos2, data[i1][n_grams-1], pos1, master_labels, n_common_words, pad)
             
             #plot prep
-            plt.figure(figsize=(8,6))
+            plt.figure(figsize=(10,8))
             plt.plot([0,n_common_words], [0,n_common_words])
             plt.plot([0,n_common_words], [0,n_common_words/2], 'g')
             plt.plot([0,n_common_words/2], [0,n_common_words], 'g')
-            plt.fill_between([0,n_common_words+pad],[n_common_words,n_common_words],[n_common_words+pad,n_common_words+pad], facecolor='red',alpha=0.5, linewidth=0)
-            plt.axvspan(n_common_words, n_common_words+pad, alpha=0.5, color='red')
-            plt.plot(pos[0], pos[1], '.', color='black')
-            for i in range(len(pos[0])):
+            plt.plot([0,n_common_words],[n_common_words,n_common_words],'r--')
+            plt.plot([n_common_words,n_common_words],[0,n_common_words],'r--')
+            #plt.fill_between([0,n_common_words+pad],[n_common_words,n_common_words],[n_common_words+pad,n_common_words+pad], facecolor='red',alpha=0.5, linewidth=0)
+            #plt.axvspan(n_common_words, n_common_words+pad, alpha=0.5, color='red')
+            plt.plot(pos1, pos2, '.', color='black')
+            for i in range(len(pos1)):
+                rot, buffx, buffy = 0, 0.5, -1
                 la = master_labels[i]
                 if la == 'nigga':
                     la = 'ni**a'
                 elif la == 'niggas':
                     la = 'ni**as'
-                plt.text(pos[0][i]+0.2, pos[1][i]+0.2, la, size=10, rotation=20)
+                if pos2[i] == n_common_words:
+                    rot, buffx, buffy = 90, 0, 5
+                plt.text(pos1[i]+buffx, pos2[i]+buffy, la, size=9, rotation=rot)
             name1, name2 = dirs[i1].split('playlists/')[1], dirs[i2].split('playlists/')[1]
             plt.xlabel('%s rank'%name1)
             plt.ylabel('%s rank'%name2)
@@ -121,7 +125,7 @@ if __name__ == '__main__':
             plt.clf()
 
     #plot distribution of words
-    plot_words = 1
+    plot_words = 0
     if plot_words == 1:
         ylabel = 'total counts'
         if norm == 1:
@@ -140,4 +144,41 @@ if __name__ == '__main__':
             plt.savefig('images/worddist_%s.png'%name)
             plt.clf()
 
-
+    #get unique words for each genre - expensive
+    get_unique = 1
+    if get_unique == 1:
+        labels, counts = [], []
+        cold_words = {}     #words popular in other genres but not this one
+        unique_words = {}   #words popular in this genre and no other
+        for i in range(len(dirs)):
+            l, c = zip(*data[i][n_grams-1].most_common(10*n_common_words))
+            labels.append(l)
+            counts.append(c)
+            cold_words[i], unique_words[i] = [], []
+        for i in range(len(dirs)):
+            for j in range(2*n_common_words):
+                label = labels[i][j]
+                ranks_ = np.zeros(0,dtype='int')     #rank for all dirs
+                counts_ = np.zeros(0,dtype='int')
+                for k in range(len(dirs)):
+                    try:
+                        index = labels[k].index(label)
+                        ranks_ = np.append(ranks_,index)
+                        counts_ = np.append(counts_,counts[k][index])
+                    except:
+                        ranks_ = np.append(ranks_,2*n_common_words)
+                        counts_ = np.append(counts_,0)
+                if len(np.where(1.5*j + 2 < ranks_)[0]) == len(ranks_)-1:
+                    unique_words[i].append(label)
+#                if label in ['work','she','sun','heart']:
+#                    print(label,ranks_,counts_)
+                if (len(np.where(np.max(ranks_)/1.5 - 2 < ranks_)[0]) == 1) and (len(np.where(np.min(counts_)*1.5 + 3 > counts_)[0]) == 1):
+                    if label not in cold_words[np.argmax(ranks_)]:
+                        cold_words[np.argmax(ranks_)].append(label)
+        
+        print("*******unique words*******")
+        for i in range(len(dirs)):
+            print(dirs[i],unique_words[i])
+        print("*******cold words*******")
+        for i in range(len(dirs)):
+            print(dirs[i],cold_words[i])
