@@ -75,18 +75,19 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
         model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
         model.add(Dense(embed_dim))
 
-        optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=1)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
     print(model.summary())
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
+    return 0
     model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
               callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=2)
     model.save(dir_model)
 
 if __name__ == '__main__':
-    genre = 'country'
+    genre = 'pop-rock-edm'
     word_or_character = 'word'
     seq_length = int(sys.argv[1])
     epochs = 40
