@@ -61,7 +61,9 @@ def unicodetoascii(text, word_or_character):
                 replace('?','').
                 replace('!','').
                 replace('.','').
-                replace(';','')
+                replace(';','').
+                replace('"','').
+                replace("'",'')
                 )
     return TEXT
 

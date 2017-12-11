@@ -23,17 +23,18 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
         set_ = []
         for s in songs:
             set_ += s
-        set_ = Counter(set_)                    #gets unique values with frequency
+        set_ = Counter(set_)                    #gets unique sorted dictionary
         for k in list(set_):
             if set_[k] < min_word_occurrence:   #delete rare words from corpus
                 del set_[k]
+        set_, vals = zip(*set_.most_common())
 
     # get char/word to int mappings and vice versa.
     len_set = len(set_)      #number of unique words/chars
-    char_to_int = dict((c, i) for i, c in enumerate(set_))
-    int_to_char = dict((i, c) for i, c in enumerate(set_))
+    text_to_int = dict((c, i) for i, c in enumerate(set_))
+    int_to_text = dict((i, c) for i, c in enumerate(set_))
     np.save('%sancillary_%s.npy'%(dir_lyrics,word_or_character),
-            [char_to_int,int_to_char,len_set])
+            [text_to_int,int_to_text,len_set])
 
     # get data arrays for training LSTMs
     for sl in seq_length:
@@ -44,10 +45,10 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
                 seq_in = lyric[j:j + sl]
                 seq_out = lyric[j + sl]
                 try:
-                    ctoi_i = [char_to_int[char] for char in seq_in]
-                    ctoi_o = char_to_int[seq_out]
-                    dataX.append(ctoi_i)
-                    dataY.append(ctoi_o)
+                    t2i_i = [text_to_int[text] for text in seq_in]
+                    t2i_o = text_to_int[seq_out]
+                    dataX.append(t2i_i)
+                    dataY.append(t2i_o)
                 except:
                     # a sparse word->int set is going to yield some
                     # rare words with no matches
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     n_songs = -1
     seq_length = [25,50,75,100,125,150,175,200]
     #seq_length = [6]
-    word_or_character = 'character'
+    word_or_character = 'word'
     
     #genre = sys.argv[1]
     #genre = 'country'
