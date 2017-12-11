@@ -1,11 +1,14 @@
+#https://danijar.com/tips-for-training-recurrent-neural-networks/
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Lambda, Input
+from keras.layers import Dense, LSTM, GRU, Embedding
+#from keras.layers import Lambda, Input
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 from keras.models import load_model
 from keras import backend as K
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import sys
 
@@ -14,6 +17,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character):
     
     X = np.load('playlists/%s/X_sl%d_%s.npy'%(genre,seq_length,word_or_character))
     y = np.load('playlists/%s/y_sl%d_%s.npy'%(genre,seq_length,word_or_character))
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     char_to_int, int_to_char, n_chars = np.load('%sancillary_%s.npy'%%(dir_lyrics,word_or_character))
     
     try:
@@ -23,23 +27,33 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character):
         print("generating new model")
         model = Sequential()
         
-        #nb_classes = len(char_to_int)
+        nb_classes = len(char_to_int)
         #input_shape, output_shape = (seq_length,), (input_shape[0], nb_classes)
         #input = Input(shape=input_shape, dtype='uint8')
         #model.add(Lambda(K.one_hot,arguments={'nb_classes': nb_classes}, output_shape=output_shape)(input))
         
-        model.add(LSTM(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
-        #model.add(LSTM(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
-        model.add(LSTM(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
+        # old network
+#        model.add(LSTM(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
+#        model.add(LSTM(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
+#        model.add(Dense(y.shape[1], activation='softmax'))
+#        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
+#        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
+#        model.add(Dense(y.shape[1], activation='softmax'))
+
+        #embedding- so probably the thing to do is use a frozen weight pre-trained embedding layer (word2vec), and the output is an embedding vector. I.e. convert all your words to embedding.
+        model.add(Embedding(nb_classes, 512, input_length=seq_length))
+        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
         model.add(Dense(y.shape[1], activation='softmax'))
-        
+
         optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
     print(model.summary())
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
-    model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks_list, validation_split=0.2, verbose=2)
+    model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
+              callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=2)
     model.save(dir_model)
 
 if __name__ == '__main__':

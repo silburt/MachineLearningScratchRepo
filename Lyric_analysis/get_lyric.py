@@ -16,7 +16,7 @@ import glob
 import re
 
 base_url = 'http://api.genius.com'
-auth = open('Authorization.txt','r').readlines()
+auth = open('utils/Authorization.txt','r').readlines()
 headers = {'Authorization': 'Bearer %s'%auth[2].split(':')[1]}
 
 def clean_names(artist, song):

@@ -1,12 +1,13 @@
 #https://github.com/vlraik/word-level-rnn-keras/blob/master/lstm_text_generation.py
 
+from collections import Counter
 import numpy as np
 import glob
 import sys
 from keras.utils import np_utils
-from process_lyrics import *
+from utils.process_lyrics import *
 
-def main(genre,n_songs,seq_length,word_or_character):
+def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
     
     # get song lyrics
     dir_lyrics = 'playlists/%s/'%genre
@@ -15,19 +16,24 @@ def main(genre,n_songs,seq_length,word_or_character):
     for i,f in enumerate(files):
         songs.append(process_song(f, word_or_character))
 
-    # get char/int mappings
+    # prepare word/character corpus
     if word_or_character == 'character':
-        data = sorted(list(set(' '.join(songs))))
+        set_ = sorted(list(set(' '.join(songs))))
     elif word_or_character == 'word':
-        data = []
+        set_ = []
         for s in songs:
-            data += s
-        data = set(data)    #gets unique values
-    n_data = len(data)      #total number of chars/words
-    char_to_int = dict((c, i) for i, c in enumerate(data))
-    int_to_char = dict((i, c) for i, c in enumerate(data))
+            set_ += s
+        set_ = Counter(set_)                    #gets unique values with frequency
+        for k in list(set_):
+            if set_[k] < min_word_occurrence:   #delete rare words from corpus
+                del set_[k]
+
+    # get char/word to int mappings and vice versa.
+    len_set = len(set_)      #number of unique words/chars
+    char_to_int = dict((c, i) for i, c in enumerate(set_))
+    int_to_char = dict((i, c) for i, c in enumerate(set_))
     np.save('%sancillary_%s.npy'%(dir_lyrics,word_or_character),
-            [char_to_int,int_to_char,n_data])
+            [char_to_int,int_to_char,len_set])
 
     # get data arrays for training LSTMs
     for sl in seq_length:
@@ -37,8 +43,15 @@ def main(genre,n_songs,seq_length,word_or_character):
             for j in range(0,len(lyric)-sl):
                 seq_in = lyric[j:j + sl]
                 seq_out = lyric[j + sl]
-                dataX.append([char_to_int[char] for char in seq_in])
-                dataY.append(char_to_int[seq_out])
+                try:
+                    ctoi_i = [char_to_int[char] for char in seq_in]
+                    ctoi_o = char_to_int[seq_out]
+                    dataX.append(ctoi_i)
+                    dataY.append(ctoi_o)
+                except:
+                    # a sparse word->int set is going to yield some
+                    # rare words with no matches
+                    pass
         n_patterns = len(dataX)
         print("Total Patterns: ", n_patterns)
 
@@ -46,8 +59,8 @@ def main(genre,n_songs,seq_length,word_or_character):
         X = np.reshape(dataX, (n_patterns,sl,1))    # reshape X:[samples,time steps,features]
         X = X / float(n_data)                       # normalize
         y = np.asarray(dataY)
-        #y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
-        #print(y.shape, n_data)
+        if word_or_character == 'character'
+            y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
 
         # save data (in chunks if too large)
 #        x_size, y_size, max_gb = X.nbytes/1e6, y.nbytes/1e6, 4

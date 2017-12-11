@@ -9,7 +9,7 @@ import numpy as np
 #nltk.download('punkt')
 import glob
 import matplotlib.pyplot as plt
-from process_lyrics import *
+from utils.process_lyrics import *
 np.random.seed(12)
 
 def get_word_ranks(cnt1, pos1, cnt2, pos2, master_labels, n_words, pad):

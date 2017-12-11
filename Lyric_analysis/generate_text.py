@@ -1,14 +1,14 @@
 import numpy as np
 import sys, glob
 from keras.models import load_model
-from process_lyrics import *
+from utils.process_lyrics import *
 
 # text generation
 def gen(genre,dir_model,seq_length,word_or_character):
     dir_lyrics = 'playlists/%s/'%genre
     
     model = load_model(dir_model)
-    char_to_int, int_to_char, n_chars = np.load('%sancillary_%s.npy'%%(dir_lyrics,word_or_character))
+    char_to_int, int_to_char, n_chars = np.load('%sancillary_%s.npy'%(dir_lyrics,word_or_character))
     
     #generate initial seed
     #ini = np.load('%s/X_sl%d.npy'%(dir_lyrics,seq_length))[0]
