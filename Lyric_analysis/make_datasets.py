@@ -50,8 +50,8 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
                     dataX.append(t2i_i)
                     dataY.append(t2i_o)
                 except:
-                    # a sparse word->int set is going to yield some
-                    # rare words with no matches
+                    # a sparse word->int set (rare words removed) is
+                    # going to yield words with no matches
                     pass
         n_patterns = len(dataX)
         print("Total Patterns: ", n_patterns)
@@ -82,11 +82,11 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
 if __name__ == '__main__':
     n_songs = -1
     #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [6]
+    seq_length = [4,6,8,10,12,15]
     word_or_character = 'word'
     
     #genre = sys.argv[1]
-    genre = 'country'
-    #genre = 'pop-rock-edm'
+    #genre = 'country'
+    genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
