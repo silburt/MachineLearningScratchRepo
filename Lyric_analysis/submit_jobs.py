@@ -5,14 +5,14 @@ import os
 import numpy as np
 
 #seq_length = [25,50,75,100,125,150,175,200]
-seq_length = [3,6,9,12,15]
+seq_length = [4,6,8,10,12,15]
 word_or_character = 'word'
 
 submit_jobs = 1
 jobs_dir = 'jobs'
 counter = 0
 for sl in seq_length:
-    job_name = 'train_lstm_sl%d.pbs'%sl
+    job_name = 'train_lstm_sl%d_%s.pbs'%(sl,word_or_character)
     with open('%s/%s'%(jobs_dir,job_name), 'w') as f:
         f.write('#!/bin/bash\n')
         f.write('#PBS -l nodes=1:gpus=1\n')
