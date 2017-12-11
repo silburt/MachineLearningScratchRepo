@@ -124,7 +124,7 @@ if __name__ == '__main__':
             plt.savefig('images/wordcorr_%s_%s.png'%(name1,name2))
             plt.clf()
 
-    #plot distribution of words
+    #plot word frequency
     plot_words = 0
     if plot_words == 1:
         ylabel = 'total counts'
@@ -144,7 +144,7 @@ if __name__ == '__main__':
             plt.savefig('images/worddist_%s.png'%name)
             plt.clf()
 
-    #get unique words for each genre - expensive
+    #get unique words for each genre
     get_unique = 1
     if get_unique == 1:
         labels, counts = [], []

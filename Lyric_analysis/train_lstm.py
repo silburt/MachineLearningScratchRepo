@@ -10,11 +10,11 @@ from keras.models import load_model
 import tensorflow as tf
 import sys
 
-def train_model(genre,dir_model,seq_length,epochs,batch_size):
+def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character):
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
     
-    X = np.load('playlists/%s/X_sl%d.npy'%(genre,seq_length))
-    y = np.load('playlists/%s/y_sl%d.npy'%(genre,seq_length))
+    X = np.load('playlists/%s/X_sl%d_%s.npy'%(genre,seq_length,word_or_character))
+    y = np.load('playlists/%s/y_sl%d_%s.npy'%(genre,seq_length,word_or_character))
     
     try:
         model = load_model(dir_model)
@@ -39,14 +39,15 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size):
 
 if __name__ == '__main__':
     genre = 'country'
+    word_or_character = 'word'
     #seq_length = 200
     seq_length = int(sys.argv[1])
-    dir_model = 'models/%s_sl%d.h5'%(genre,seq_length)
+    dir_model = 'models/%s_sl%d_%s.h5'%(genre,seq_length,word_or_character)
     
     epochs = 40
     batch_size = 256
     
-    train_model(genre,dir_model,seq_length,epochs,batch_size)
+    train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character)
 
 
 
