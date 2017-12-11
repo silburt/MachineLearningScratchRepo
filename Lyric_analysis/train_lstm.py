@@ -28,7 +28,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character):
         model.add(Dropout(0.2))
         model.add(Dense(y.shape[1], activation='softmax'))
         
-        optimizer = Adam(lr=1e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
     print(model.summary())

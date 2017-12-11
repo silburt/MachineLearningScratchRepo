@@ -56,7 +56,7 @@ def main(genre,n_songs,seq_length,word_or_character):
 if __name__ == '__main__':
     n_songs = -1
     #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [6]
+    seq_length = [3,6,9,12,15]
     word_or_character = 'word'
     
     #genre = sys.argv[1]
