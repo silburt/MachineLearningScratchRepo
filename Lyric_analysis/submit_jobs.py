@@ -4,7 +4,8 @@
 import os
 import numpy as np
 
-seq_length = [25,50,75,100,125,150,175,200]
+#seq_length = [25,50,75,100,125,150,175,200]
+seq_length = [3,6,9,12,15]
 
 submit_jobs = 1
 jobs_dir = 'jobs'

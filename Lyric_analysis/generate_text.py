@@ -4,11 +4,11 @@ from keras.models import load_model
 from process_lyrics import *
 
 # text generation
-def gen(genre,dir_model,seq_length):
+def gen(genre,dir_model,seq_length,word_or_character):
     dir_lyrics = 'playlists/%s/'%genre
     
     model = load_model(dir_model)
-    char_to_int, int_to_char, n_chars = np.load('%sancillary_sl%d.npy'%(dir_lyrics,seq_length))
+    char_to_int, int_to_char, n_chars = np.load('%sancillary_%s.npy'%%(dir_lyrics,word_or_character))
     
     #generate initial seed
     #ini = np.load('%s/X_sl%d.npy'%(dir_lyrics,seq_length))[0]
@@ -17,7 +17,7 @@ def gen(genre,dir_model,seq_length):
     #generate initial seed
     songs = glob.glob('%s/*.txt'%dir_lyrics)
     seed = np.random.randint(0, len(songs))
-    ini = list(process_song(songs[seed],'character')[:seq_length])
+    ini = list(process_song(songs[seed],word_or_character)[:seq_length])
     pattern = [char_to_int[c] for c in list(ini)]
     print(songs[seed])
     print(''.join([int_to_char[c] for c in pattern]))
@@ -39,9 +39,10 @@ def gen(genre,dir_model,seq_length):
 
 if __name__ == '__main__':
     genre = 'pop-rock-edm'
+    word_or_character = 'word'
     seq_lengths = [25,50,75,100,125,150,175,200]
     
     for seq_length in seq_lengths:
         print('***********seq_length=%d***********'%seq_length)
-        dir_model = 'models/%s_sl%d.h5'%(genre,seq_length)
-        gen(genre,dir_model,seq_length)
+        dir_model = 'models/%s_sl%d_%s.h5'%(genre,seq_length,word_or_character)
+        gen(genre,dir_model,seq_length,word_or_character)
