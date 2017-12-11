@@ -57,10 +57,10 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
         print("Total Patterns: ", n_patterns)
 
         # prepare
-        X = np.reshape(dataX, (n_patterns,sl,1))    # reshape X:[samples,time steps,features]
-        X = X / float(n_data)                       # normalize
+        X = np.reshape(dataX, (n_patterns,sl,1))        # reshape X:[samples,time steps,features]
         y = np.asarray(dataY)
-        if word_or_character == 'character'
+        if word_or_character == 'character':
+            X = X / float(len_set)                      # normalize
             y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
 
         # save data (in chunks if too large)
@@ -81,12 +81,12 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
 
 if __name__ == '__main__':
     n_songs = -1
-    seq_length = [25,50,75,100,125,150,175,200]
-    #seq_length = [6]
+    #seq_length = [25,50,75,100,125,150,175,200]
+    seq_length = [6]
     word_or_character = 'word'
     
     #genre = sys.argv[1]
-    #genre = 'country'
-    genre = 'pop-rock-edm'
+    genre = 'country'
+    #genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
