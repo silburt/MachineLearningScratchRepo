@@ -39,7 +39,7 @@ def gen(genre,dir_model,seq_length,word_or_character):
 
 if __name__ == '__main__':
     genre = 'pop-rock-edm'
-    word_or_character = 'word'
+    word_or_character = 'character'
     seq_lengths = [25,50,75,100,125,150,175,200]
     
     for seq_length in seq_lengths:

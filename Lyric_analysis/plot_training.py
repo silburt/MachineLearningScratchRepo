@@ -12,7 +12,10 @@ for f in files:
     #    if ('Epoch' in l) and ('loss:' in l):
     #        loss.append(float(l.split('Epoch')[0].split('loss:')[1]))
         if 'val_loss' in l:
-            loss.append(float(l.split('val_loss:')[1]))
+            try:
+                loss.append(float(l.split('val_loss:')[1]))
+            except:
+                pass
 
     plt.plot(range(1,len(loss)+1), loss)
     plt.xlabel('epoch')

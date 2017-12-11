@@ -45,21 +45,34 @@ def main(genre,n_songs,seq_length,word_or_character):
         # prepare
         X = np.reshape(dataX, (n_patterns,sl,1))    # reshape X:[samples,time steps,features]
         X = X / float(n_data)                       # normalize
-        y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
-        print(y.shape, n_data)
+        y = np.asarray(dataY)
+        #y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
+        #print(y.shape, n_data)
 
-        # save data
+        # save data (in chunks if too large)
+#        x_size, y_size, max_gb = X.nbytes/1e6, y.nbytes/1e6, 4
+#        if x_size < max_gb and y_size < max_gb:
         np.save('%sX_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),X)
         np.save('%sy_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),y)
+#        else:
+#            n_chunks = int(round(max(x_size/max_gb, y_size/max_gb)))
+#            inc = int(n_patterns/float(n_chunks))
+#            print(n_chunks, inc)
+#            for i in range(int(n_chunks)):
+#                np.save('%sX_sl%d_%s_c%d.npy'%(dir_lyrics,sl,word_or_character,i),
+#                        X[inc*i:inc*(i+1)])
+#                np.save('%sy_sl%d_%s_c%d.npy'%(dir_lyrics,sl,word_or_character,i),
+#                        y[inc*i:inc*(i+1)])
 
 
 if __name__ == '__main__':
     n_songs = -1
-    #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [3,6,9,12,15]
-    word_or_character = 'word'
+    seq_length = [25,50,75,100,125,150,175,200]
+    #seq_length = [6]
+    word_or_character = 'character'
     
     #genre = sys.argv[1]
-    genre = 'country'
+    #genre = 'country'
+    genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
