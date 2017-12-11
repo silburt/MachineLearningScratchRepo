@@ -6,6 +6,7 @@ import numpy as np
 
 #seq_length = [25,50,75,100,125,150,175,200]
 seq_length = [3,6,9,12,15]
+word_or_character = 'word'
 
 submit_jobs = 1
 jobs_dir = 'jobs'
@@ -22,7 +23,7 @@ for sl in seq_length:
         f.write('cd $PBS_O_WORKDIR\n')
         f.write('module load python/3.3.2\n')
         f.write('export PATH="/storage/work/ajs725/conda/install/bin:$PATH"\n\n')
-        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d &>> sl%d.txt'%(sl,sl))
+        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d &>> sl%d_%s.txt'%(sl,sl,word_or_character))
     f.close()
 
     if submit_jobs == 1:
