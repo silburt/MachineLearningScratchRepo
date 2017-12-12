@@ -42,11 +42,11 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
             x = np.reshape(pattern, (1, seq_length))
             pred = model.predict(x, verbose=0)
             proj = np.sum(pred*embedding_matrix,axis=1)
-            index = np.argmax(proj)
+            #index = np.argmax(proj)
             
-#            probs = np.nan_to_num(proj/np.sum((np.abs(pred)*matrix_abs),axis=1))
-#            probs = (probs - np.min(probs))/(np.max(probs) - np.min(probs))
-#            index = np.random.choice(embedding_matrix.shape[0], p=probs)
+            probs = proj + np.min(proj)
+            probs /= np.sum(probs)
+            index = np.random.choice(embedding_matrix.shape[0], p=probs)
 
             result = labels[index]
             sys.stdout.write(' %s'%result)
