@@ -22,7 +22,7 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
         print(''.join([int_to_text[c] for c in pattern]))
         print("****predicted lyrics:****")
         for i in range(300):
-            x = np.reshape(pattern, (1, len(pattern), 1))
+            x = np.reshape(pattern, (1, seq_length, 1))
             x = x / float(len_set)
             pred = model.predict(x, verbose=0)
             #index = np.argmax(pred)
@@ -39,7 +39,7 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
         matrix_abs = np.abs(embedding_matrix)
         labels = list(text_to_int.keys())
         for i in range(100):
-            x = np.reshape(pattern, (1, len(pattern))
+            x = np.reshape(pattern, (1, seq_length))
             pred = model.predict(x, verbose=0)
             proj = np.sum(pred*embedding_matrix,axis=1)
             index = np.argmax(proj)
