@@ -101,7 +101,7 @@ if __name__ == '__main__':
     seq_length = [4,6,8,10,12,15]
     word_or_character = 'word'
 
-    genre = 'country'
-    #genre = 'pop-rock-edm'
+    #genre = 'country'
+    genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
