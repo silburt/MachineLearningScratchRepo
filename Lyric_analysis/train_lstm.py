@@ -52,7 +52,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
     model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
-              callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=2)
+              callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=1)
     model.save(dir_model)
 
 if __name__ == '__main__':
