@@ -12,33 +12,6 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import sys
 
-# https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
-def get_embedding_matrix(text_to_int,embed_dim,y):
-    f = open('utils/glove.6B/glove.6B.%dd.txt'%embed_dim,'r',encoding='utf-8')
-    
-    embeddings_index = {}
-    for line in f:
-        values = line.split()
-        word = values[0]
-        coefs = np.asarray(values[1:], dtype='float32')
-        embeddings_index[word] = coefs
-    f.close()
-    print('Found %s word vectors.' % len(embeddings_index))
-
-    embedding_matrix = np.zeros((len(text_to_int), embed_dim))
-    for word, i in text_to_int.items():
-        embedding_vector = embeddings_index.get(word)
-        if embedding_vector is not None:
-            # words not found in embedding index will be all-zeros.
-            embedding_matrix[i] = embedding_vector
-
-    # embed y-data
-    y_embed = np.zeros((len(y), embed_dim))
-    for i in range(len(y)):
-        y_embed[i] = embedding_matrix[y[i]]
-
-    return embedding_matrix, y_embed
-
 def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,embed_dim=50):
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
     
