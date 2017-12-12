@@ -7,7 +7,34 @@ import sys
 from keras.utils import np_utils
 from utils.process_lyrics import *
 
-def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
+# https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
+def get_embedding_matrix(text_to_int,embed_dim,y):
+    f = open('utils/glove.6B/glove.6B.%dd.txt'%embed_dim,'r',encoding='utf-8')
+    
+    embeddings_index = {}
+    for line in f:
+        values = line.split()
+        word = values[0]
+        coefs = np.asarray(values[1:], dtype='float32')
+        embeddings_index[word] = coefs
+    f.close()
+    print('Found %s word vectors.' % len(embeddings_index))
+
+    embedding_matrix = np.zeros((len(text_to_int), embed_dim))
+    for word, i in text_to_int.items():
+        embedding_vector = embeddings_index.get(word)
+        if embedding_vector is not None:
+            # words not found in embedding index will be all-zeros.
+            embedding_matrix[i] = embedding_vector
+
+    # embed y-data
+    y_embed = np.zeros((len(y), embed_dim))
+    for i in range(len(y)):
+        y_embed[i] = embedding_matrix[y[i]]
+
+    return embedding_matrix, y_embed
+
+def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_dim=50):
     
     # get song lyrics
     dir_lyrics = 'playlists/%s/'%genre
@@ -60,34 +87,29 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2):
         X = np.asarray(dataX)
         y = np.asarray(dataY)
         if word_or_character == 'character':
-            X = np.reshape(dataX, (n_patterns,sl,1))        # reshape X:[samples,time steps,features]
+            X = np.reshape(dataX, (n_patterns,sl,1))    # reshape X:[samples,time steps,features]
             X = X / float(len_set)                      # normalize
             y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
+        elif word_or_character == 'word':
+            embedding_matrix, y = get_embedding_matrix(text_to_int,embed_dim,y)
+            np.save('%sembedding_matrix_%dd.npy'%(dir_lyrics,embed_dim),embedding_matrix)
 
-        # save data (in chunks if too large)
-#        x_size, y_size, max_gb = X.nbytes/1e6, y.nbytes/1e6, 4
-#        if x_size < max_gb and y_size < max_gb:
+        # save data
         np.save('%sX_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),X)
         np.save('%sy_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),y)
-#        else:
-#            n_chunks = int(round(max(x_size/max_gb, y_size/max_gb)))
-#            inc = int(n_patterns/float(n_chunks))
-#            print(n_chunks, inc)
-#            for i in range(int(n_chunks)):
-#                np.save('%sX_sl%d_%s_c%d.npy'%(dir_lyrics,sl,word_or_character,i),
-#                        X[inc*i:inc*(i+1)])
-#                np.save('%sy_sl%d_%s_c%d.npy'%(dir_lyrics,sl,word_or_character,i),
-#                        y[inc*i:inc*(i+1)])
-
 
 if __name__ == '__main__':
-    n_songs = 10
+    n_songs = -1
     #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [4,6,8,10,12,15]
+    seq_length = [4]#,6,8,10,12,15]
     word_or_character = 'word'
     
     #genre = sys.argv[1]
-    #genre = 'country'
-    genre = 'pop-rock-edm'
+    genre = 'country'
+    #genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
+
+
+#        x_size, y_size, max_gb = X.nbytes/1e6, y.nbytes/1e6, 4
+#        if x_size < max_gb and y_size < max_gb:

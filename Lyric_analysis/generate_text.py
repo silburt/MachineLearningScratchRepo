@@ -1,40 +1,57 @@
 import numpy as np
 import sys, glob
-from keras.models import load_model
 from utils.process_lyrics import *
+from keras.models import load_model
 
 # text generation
-def gen(genre,dir_model,seq_length,word_or_character):
+def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
     dir_lyrics = 'playlists/%s/'%genre
     
     model = load_model(dir_model)
-    char_to_int, int_to_char, n_chars = np.load('%sancillary_%s.npy'%(dir_lyrics,word_or_character))
-    
-    #generate initial seed
-    #ini = np.load('%s/X_sl%d.npy'%(dir_lyrics,seq_length))[0]
-    #pattern = [int(c*n_chars) for c in list(ini)]
+    text_to_int, int_to_text, len_set = np.load('%sancillary_%s.npy'%(dir_lyrics,word_or_character))
     
     #generate initial seed
     songs = glob.glob('%s/*.txt'%dir_lyrics)
     seed = np.random.randint(0, len(songs))
     ini = list(process_song(songs[seed],word_or_character)[:seq_length])
-    pattern = [char_to_int[c] for c in list(ini)]
+    pattern = [text_to_int[c] for c in list(ini)]
     print(songs[seed])
-    print(''.join([int_to_char[c] for c in pattern]))
-    print("****predicted lyrics:****")
     
-    # generate characters
-    for i in range(300):
-        x = np.reshape(pattern, (1, len(pattern), 1))
-        x = x / float(n_chars)
-        pred = model.predict(x, verbose=0)
-        #index = np.argmax(pred)
-        index = np.random.choice(len(pred[0]), p=pred[0])
-        result = int_to_char[index]
-        #seq_in = [int_to_char[value] for value in pattern]
-        sys.stdout.write(result)
-        pattern.append(index)
-        pattern = pattern[1:len(pattern)]
+    # generate text
+    if word_or_character == 'character':
+        print(''.join([int_to_text[c] for c in pattern]))
+        print("****predicted lyrics:****")
+        for i in range(300):
+            x = np.reshape(pattern, (1, len(pattern), 1))
+            x = x / float(len_set)
+            pred = model.predict(x, verbose=0)
+            #index = np.argmax(pred)
+            index = np.random.choice(len(pred[0]), p=pred[0])
+            result = int_to_text[index]
+            sys.stdout.write(result)
+            pattern.append(index)
+            pattern = pattern[1:len(pattern)]
+
+    elif word_or_character == 'word':
+        print(' '.join([int_to_text[c] for c in pattern]))
+        print("****predicted lyrics:****")
+        embedding_matrix = np.load('%sembedding_matrix_%dd.npy'%(dir_lyrics,embed_dim))
+        matrix_abs = np.abs(embedding_matrix)
+        labels = list(text_to_int.keys())
+        for i in range(100):
+            pred = model.predict(x, verbose=0)
+            proj = np.sum(pred*embedding_matrix,axis=1)
+            index = np.argmax(proj)
+            
+            probs = np.nan_to_num(proj/np.sum((np.abs(pred)*matrix_abs),axis=1))
+            probs = (probs - np.min(probs))/(np.max(probs) - np.min(probs))
+            index = np.random.choice(embedding_matrix.shape[0], p=probs)
+            
+            result = labels[index]
+            sys.stdout.write(result)
+            pattern.append(index)
+            pattern = pattern[1:len(pattern)]
+
     print("\nDone.")
 
 if __name__ == '__main__':

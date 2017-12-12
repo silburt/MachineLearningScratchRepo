@@ -45,9 +45,6 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
     text_to_int, int_to_text, n_chars = np.load('playlists/%s/ancillary_%s.npy'%(genre,word_or_character))
     X = np.load('playlists/%s/X_sl%d_%s.npy'%(genre,seq_length,word_or_character))
     y = np.load('playlists/%s/y_sl%d_%s.npy'%(genre,seq_length,word_or_character))
-    if word_or_character == 'word':
-        embedding_matrix, y = get_embedding_matrix(text_to_int,embed_dim,y)
-        print('Successfully generated word embeddings')
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -58,25 +55,23 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
         print("generating new model")
         model = Sequential()
         
-        #nb_classes = len(char_to_int)
-        #input_shape, output_shape = (seq_length,), (input_shape[0], nb_classes)
-        #input = Input(shape=input_shape, dtype='uint8')
-        #model.add(Lambda(K.one_hot,arguments={'nb_classes': nb_classes}, output_shape=output_shape)(input))
-        
-        # old network
-#        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
-#        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
-#        model.add(Dense(y.shape[1], activation='softmax'))
+        if word_or_character == 'character':
+            model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
+            model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
+            model.add(Dense(y.shape[1], activation='softmax'))
+            loss = 'categorical_crossentropy'
 
-        # frozen weight embedding
-        model.add(Embedding(len(text_to_int), embed_dim, weights=[embedding_matrix],
-                            input_length=seq_length, trainable=False))
-        model.add(GRU(embed_dim, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
-        model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
-        model.add(Dense(embed_dim))
+        if word_or_character == 'word':
+            embedding_matrix = np.load('playlists/%s/embedding_matrix_%dd.npy'%(genre,embed_dim))
+            model.add(Embedding(len(text_to_int), embed_dim, weights=[embedding_matrix],
+                                input_length=seq_length, trainable=False))
+            model.add(GRU(embed_dim, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+            model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
+            model.add(Dense(embed_dim))
+            loss = 'mean_squared_error'
 
         optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=1)
-        model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+        model.compile(loss=loss, optimizer=optimizer)
 
     print(model.summary())
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
