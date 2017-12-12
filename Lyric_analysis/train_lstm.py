@@ -41,10 +41,10 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
             model.add(GRU(embed_dim, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
             model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
             model.add(Dense(embed_dim, activation='linear'))
-            #loss = 'mean_squared_error'    #maybe try cosine_proximity? You are outputting vectors after all
-            loss = 'mean_absolute_error'
+            loss = 'mean_squared_error'    #maybe try cosine_proximity? You are outputting vectors after all
+            #loss = 'mean_absolute_error'
 
-        lr = 5e-3
+        lr = 1e-4
         optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=lr/epochs, clipvalue=1)
         model.compile(loss=loss, optimizer=optimizer)
 
