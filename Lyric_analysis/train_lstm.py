@@ -67,7 +67,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
                                 input_length=seq_length, trainable=False))
             model.add(GRU(embed_dim, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
             model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
-            model.add(Dense(embed_dim))
+            model.add(Dense(embed_dim, activation='linear'))
             loss = 'mean_squared_error'
 
         optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=1)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     genre = 'pop-rock-edm'
     word_or_character = 'word'
     seq_length = int(sys.argv[1])
-    epochs = 40
+    epochs = 1000
     batch_size = 256
     
     dir_model = 'models/%s_sl%d_%s.h5'%(genre,seq_length,word_or_character)

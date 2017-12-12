@@ -4,8 +4,8 @@ from collections import Counter
 import numpy as np
 import glob
 import sys
-from keras.utils import np_utils
 from utils.process_lyrics import *
+from keras.utils import np_utils
 
 # https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
 def get_embedding_matrix(text_to_int,embed_dim):
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     #seq_length = [25,50,75,100,125,150,175,200]
     seq_length = [4,6,8,10,12,15]
     word_or_character = 'word'
-    
+
     genre = 'country'
     #genre = 'pop-rock-edm'
 
