@@ -39,7 +39,8 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
         matrix_abs = np.abs(embedding_matrix)
         labels = list(text_to_int.keys())
         for i in range(100):
-            pred = model.predict(pattern, verbose=0)
+            x = np.reshape(pattern, (1, len(pattern))
+            pred = model.predict(x, verbose=0)
             proj = np.sum(pred*embedding_matrix,axis=1)
             index = np.argmax(proj)
             
