@@ -2,9 +2,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-files = [25,50,75,100,125,150,175,200]
+files = [4,6,8,10,12,15]
 for f in files:
-    file = 'output/sl%d.txt'%f
+    file = 'output/sl%d_word.txt'%f
 
     lines = open(file,'r').readlines()
     loss = []

@@ -41,23 +41,25 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
             model.add(GRU(embed_dim, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
             model.add(GRU(512, dropout=0.2, recurrent_dropout=0.2, return_sequences=False))
             model.add(Dense(embed_dim, activation='linear'))
-            loss = 'mean_squared_error'
+            #loss = 'mean_squared_error'    #maybe try cosine_proximity? You are outputting vectors after all
+            loss = 'mean_absolute_error'
 
-        optimizer = Adam(lr=2e-5, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=1)
+        lr = 5e-3
+        optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=lr/eopchs, clipvalue=1)
         model.compile(loss=loss, optimizer=optimizer)
 
     print(model.summary())
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
     model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
-              callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=1)
+              callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=2)
     model.save(dir_model)
 
 if __name__ == '__main__':
     genre = 'pop-rock-edm'
     word_or_character = 'word'
     seq_length = int(sys.argv[1])
-    epochs = 1000
+    epochs = 5000
     batch_size = 256
     
     dir_model = 'models/%s_sl%d_%s.h5'%(genre,seq_length,word_or_character)
