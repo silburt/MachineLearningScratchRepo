@@ -49,7 +49,7 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
 #            index = np.random.choice(embedding_matrix.shape[0], p=probs)
 
             result = labels[index]
-            sys.stdout.write(result)
+            sys.stdout.write(' %s'%result)
             pattern.append(index)
             pattern = pattern[1:len(pattern)]
 
@@ -58,7 +58,7 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
 if __name__ == '__main__':
     genre = 'pop-rock-edm'
     word_or_character = 'word'
-    seq_lengths = [4,6,8,10,12,15]
+    seq_lengths = [4,6,8,10,15]
 #    seq_lengths = [25,50,75,100,125,150,175,200]
 
     for seq_length in seq_lengths:
