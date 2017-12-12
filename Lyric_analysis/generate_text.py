@@ -43,10 +43,10 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
             proj = np.sum(pred*embedding_matrix,axis=1)
             index = np.argmax(proj)
             
-            probs = np.nan_to_num(proj/np.sum((np.abs(pred)*matrix_abs),axis=1))
-            probs = (probs - np.min(probs))/(np.max(probs) - np.min(probs))
-            index = np.random.choice(embedding_matrix.shape[0], p=probs)
-            
+#            probs = np.nan_to_num(proj/np.sum((np.abs(pred)*matrix_abs),axis=1))
+#            probs = (probs - np.min(probs))/(np.max(probs) - np.min(probs))
+#            index = np.random.choice(embedding_matrix.shape[0], p=probs)
+
             result = labels[index]
             sys.stdout.write(result)
             pattern.append(index)
@@ -56,9 +56,10 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
 
 if __name__ == '__main__':
     genre = 'pop-rock-edm'
-    word_or_character = 'character'
-    seq_lengths = [25,50,75,100,125,150,175,200]
-    
+    word_or_character = 'word'
+    seq_lengths = [4,6,8,10,12,15]
+#    seq_lengths = [25,50,75,100,125,150,175,200]
+
     for seq_length in seq_lengths:
         print('***********seq_length=%d***********'%seq_length)
         dir_model = 'models/%s_sl%d_%s.h5'%(genre,seq_length,word_or_character)

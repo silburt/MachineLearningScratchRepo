@@ -8,7 +8,7 @@ from keras.utils import np_utils
 from utils.process_lyrics import *
 
 # https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
-def get_embedding_matrix(text_to_int,embed_dim,y):
+def get_embedding_matrix(text_to_int,embed_dim):
     f = open('utils/glove.6B/glove.6B.%dd.txt'%embed_dim,'r',encoding='utf-8')
     
     embeddings_index = {}
@@ -27,12 +27,7 @@ def get_embedding_matrix(text_to_int,embed_dim,y):
             # words not found in embedding index will be all-zeros.
             embedding_matrix[i] = embedding_vector
 
-    # embed y-data
-    y_embed = np.zeros((len(y), embed_dim))
-    for i in range(len(y)):
-        y_embed[i] = embedding_matrix[y[i]]
-
-    return embedding_matrix, y_embed
+    return embedding_matrix
 
 def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_dim=50):
     
@@ -60,8 +55,10 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
     len_set = len(set_)      #number of unique words/chars
     text_to_int = dict((c, i) for i, c in enumerate(set_))
     int_to_text = dict((i, c) for i, c in enumerate(set_))
-    np.save('%sancillary_%s.npy'%(dir_lyrics,word_or_character),
-            [text_to_int,int_to_text,len_set])
+    np.save('%sancillary_%s.npy'%(dir_lyrics,word_or_character),[text_to_int,int_to_text,len_set])
+    if word_or_character == 'word':
+        embedding_matrix = get_embedding_matrix(text_to_int,embed_dim)
+        np.save('%sembedding_matrix_%dd.npy'%(dir_lyrics,embed_dim),embedding_matrix)
 
     # get data arrays for training LSTMs
     for sl in seq_length:
@@ -83,16 +80,16 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
         n_patterns = len(dataX)
         print("Total Patterns: ", n_patterns)
 
-        # prepare
+        # make X and y datasets
         X = np.asarray(dataX)
-        y = np.asarray(dataY)
         if word_or_character == 'character':
             X = np.reshape(dataX, (n_patterns,sl,1))    # reshape X:[samples,time steps,features]
             X = X / float(len_set)                      # normalize
             y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
         elif word_or_character == 'word':
-            embedding_matrix, y = get_embedding_matrix(text_to_int,embed_dim,y)
-            np.save('%sembedding_matrix_%dd.npy'%(dir_lyrics,embed_dim),embedding_matrix)
+            y = np.zeros((len(dataY), embed_dim))
+            for i in range(len(dataY)):
+                y[i] = embedding_matrix[dataY[i]]
 
         # save data
         np.save('%sX_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),X)
@@ -101,15 +98,10 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
 if __name__ == '__main__':
     n_songs = -1
     #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [4]#,6,8,10,12,15]
+    seq_length = [4,6,8,10,12,15]
     word_or_character = 'word'
     
-    #genre = sys.argv[1]
     genre = 'country'
     #genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
-
-
-#        x_size, y_size, max_gb = X.nbytes/1e6, y.nbytes/1e6, 4
-#        if x_size < max_gb and y_size < max_gb:
