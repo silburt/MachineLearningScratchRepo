@@ -44,7 +44,7 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
             proj = np.sum(pred*embedding_matrix,axis=1)
             #index = np.argmax(proj)
             
-            probs = proj + np.min(proj)
+            probs = proj - np.min(proj)
             probs /= np.sum(probs)
             index = np.random.choice(embedding_matrix.shape[0], p=probs)
 
