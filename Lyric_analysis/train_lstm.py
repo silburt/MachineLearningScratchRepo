@@ -45,7 +45,7 @@ def train_model(genre,dir_model,seq_length,epochs,batch_size,word_or_character,e
             loss = 'mean_absolute_error'
 
         lr = 5e-3
-        optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=lr/eopchs, clipvalue=1)
+        optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=lr/epochs, clipvalue=1)
         model.compile(loss=loss, optimizer=optimizer)
 
     print(model.summary())
