@@ -34,9 +34,10 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
     # get song lyrics
     dir_lyrics = 'playlists/%s/'%genre
     files = glob.glob('%s*.txt'%dir_lyrics)[0:n_songs]
-    songs, n_songs = [], len(files)
+    songs, song_names, n_songs = [], [], len(files)
     for i,f in enumerate(files):
         songs.append(process_song(f, word_or_character))
+        song_names.append(f)
 
     # prepare word/character corpus
     if word_or_character == 'character':
@@ -62,7 +63,7 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
 
     # get data arrays for training LSTMs
     for sl in seq_length:
-        dataX, dataY = [], []
+        dataX, dataY, data_songnames = [], [], []
         for i in range(n_songs):
             lyric = songs[i]
             for j in range(0,len(lyric)-sl):
@@ -73,6 +74,7 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
                     t2i_o = text_to_int[seq_out]
                     dataX.append(t2i_i)
                     dataY.append(t2i_o)
+                    data_songnames.append(song_names[i])
                 except:
                     # a sparse word->int set (rare words removed) is
                     # going to yield words with no matches
@@ -94,6 +96,7 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
         # save data
         np.save('%sX_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),X)
         np.save('%sy_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),y)
+        np.save('%ssong_names_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),data_songnames)
 
 if __name__ == '__main__':
     n_songs = -1
