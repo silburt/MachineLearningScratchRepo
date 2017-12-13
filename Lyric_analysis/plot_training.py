@@ -1,5 +1,6 @@
 #This script plots the loss vs. epoch
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import numpy as np
 
 files = [4,6,8,10,12,15]
