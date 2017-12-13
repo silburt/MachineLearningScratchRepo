@@ -4,7 +4,8 @@ import numpy as np
 
 files = [4,6,8,10,12,15]
 for f in files:
-    file = 'output/sl%d_word.txt'%f
+    #file = 'output/sl%d_word.txt'%f
+    file = 'sl%d_word.txt'%f
 
     lines = open(file,'r').readlines()
     loss = []
