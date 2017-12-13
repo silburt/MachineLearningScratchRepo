@@ -23,7 +23,7 @@ for sl in seq_length:
         f.write('cd $PBS_O_WORKDIR\n')
         f.write('module load python/3.3.2\n')
         f.write('export PATH="/storage/work/ajs725/conda/install/bin:$PATH"\n\n')
-        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d &>> sl%d_%s.txt'%(sl,sl,word_or_character))
+        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d > output/sl%d_%s.txt'%(sl,sl,word_or_character))
     f.close()
 
     if submit_jobs == 1:
