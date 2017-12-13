@@ -12,9 +12,15 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
     
     #generate initial seed
     songs = glob.glob('%s/*.txt'%dir_lyrics)
-    seed = np.random.randint(0, len(songs))
-    ini = list(process_song(songs[seed],word_or_character)[:seq_length])
-    pattern = [text_to_int[c] for c in list(ini)]
+    while pattern == None:
+        seed = np.random.randint(0, len(songs))
+        ini = list(process_song(songs[seed],word_or_character)[:seq_length])
+        try:
+            pattern = [text_to_int[c] for c in list(ini)]
+        except:
+            # sometimes we choose a lyric with rare words
+            # not in the text_to_int conversion.
+            pass
     print(songs[seed])
     
     # generate text
