@@ -58,7 +58,7 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
     int_to_text = dict((i, c) for i, c in enumerate(set_))
     np.save('%sancillary_%s.npy'%(dir_lyrics,word_or_character),[text_to_int,int_to_text,len_set])
     if word_or_character == 'word':
-        embedding_matrix = get_embedding_matrix(text_to_int,embed_dim)
+        embedding_matrix = get_embedding_matrix(text_to_int,embed_dim)        
         np.save('%sembedding_matrix_%dd.npy'%(dir_lyrics,embed_dim),embedding_matrix)
 
     # get data arrays for training LSTMs
@@ -90,6 +90,7 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
             y = np_utils.to_categorical(dataY)          # 1-hot encode the output variable
         elif word_or_character == 'word':
             y = np.zeros((len(dataY), embed_dim))
+            np.save('%syraw_sl%d_%s.npy'%(dir_lyrics,sl,word_or_character),np.asarray(dataY))
             for i in range(len(dataY)):
                 y[i] = embedding_matrix[dataY[i]]
 
@@ -101,10 +102,10 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
 if __name__ == '__main__':
     n_songs = -1
     #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [4,6,8,10,12,15]
+    seq_length = [4]#,6,8,10,12,15]
     word_or_character = 'word'
 
-    #genre = 'country'
-    genre = 'pop-rock-edm'
+    genre = 'country'
+    #genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)
