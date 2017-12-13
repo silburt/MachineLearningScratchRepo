@@ -51,13 +51,13 @@ def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
             pred = model.predict(x, verbose=0)
             pred_norm = np.sqrt(np.sum(pred*pred))
             proj = np.sum(pred*em,axis=1)/(em_norms*pred_norm) #cosine similarity
-            #index = np.argmax(proj)
+            index = np.argmax(proj)
             
             #probs = proj - np.min(proj)
             #probs /= np.sum(probs)
             #index = np.random.choice(em.shape[0], p=probs)
-            proj[proj<0] = 0
-            index = np.random.choice(em.shape[0], p=proj)
+            #proj[proj<0] = 0
+            #index = np.random.choice(em.shape[0], p=proj)
 
             result = labels[index]
             sys.stdout.write(' %s'%result)
