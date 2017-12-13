@@ -24,7 +24,7 @@ for sl in seq_length:
         for x in X[r]:
             ex.append(int_to_text[x])
         if word_or_character == 'word':
-            why = labels[np.argmax(np.sum((embedding_matrix-y[r])**2,axis=1))]
+            why = labels[np.argmax(np.sum(y[r]*embedding_matrix,axis=1))]
             if why == 'you':
                 print(y[r])
         elif word_or_character == 'character':
