@@ -1,7 +1,7 @@
 import numpy as np
 np.random.seed(2)
 
-genre = 'country'
+genre = 'pop-rock-edm'
 word_or_character = 'character'
 N_check = 50
 embed_dim = 50
@@ -20,8 +20,9 @@ err_count = 0
 for sl in seq_length:
     X = np.load('%sX_sl%d_%s.npy'%(dir,sl,word_or_character))
     y = np.load('%sy_sl%d_%s.npy'%(dir,sl,word_or_character))
-    y_raw = np.load('%syraw_sl%d_%s.npy'%(dir,sl,word_or_character))
     song_names = np.load('%ssong_names_sl%d_%s.npy'%(dir,sl,word_or_character))
+    if word_or_character == 'word':
+        y_raw = np.load('%syraw_sl%d_%s.npy'%(dir,sl,word_or_character))
 
     ran = np.random.randint(0,X.shape[0],N_check)
     for r in ran:
