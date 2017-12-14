@@ -2,10 +2,11 @@ import numpy as np
 np.random.seed(2)
 
 genre = 'country'
-word_or_character = 'word'
+word_or_character = 'character'
 N_check = 50
 embed_dim = 50
-seq_length = [4]#,6,8,10,15]
+#seq_length = [4]#,6,8,10,15]
+seq_length = [125]
 
 dir = 'playlists/%s/'%genre
 text_to_int, int_to_text, n_chars = np.load('%sancillary_%s.npy'%(dir,word_or_character))

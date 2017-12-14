@@ -1,4 +1,5 @@
 #https://danijar.com/tips-for-training-recurrent-neural-networks/
+#https://github.com/keras-team/keras/blob/master/examples/lstm_text_generation.py - apparently this works...
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, GRU, Embedding

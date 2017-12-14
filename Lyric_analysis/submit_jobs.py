@@ -4,9 +4,9 @@
 import os
 import numpy as np
 
-#seq_length = [25,50,75,100,125,150,175,200]
-seq_length = [4,6,8,10,12,15]
-word_or_character = 'word'
+seq_length = [25,50,75,100,125,150,175,200]
+#seq_length = [4,6,8,10,12,15]
+word_or_character = 'character'
 
 submit_jobs = 1
 jobs_dir = 'jobs'
