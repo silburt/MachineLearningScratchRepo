@@ -34,10 +34,11 @@ def get_stats(dir, norm, n_songs, print_=0):
     cnt, bi_cnt, tri_cnt = Counter(), Counter(), Counter()
     words_per_song = 0
     n_processed_songs = 0
+    min_words_per_song = 15     #ignore instrumentals
     for f in files:
         #lyric = get_clean_lyric(f)
         lyric = process_song(f, 'word')
-        if len(lyric) > 15: #ignore instrumentals
+        if len(lyric) > min_words_per_song:
             bi_lyric=nltk.FreqDist(nltk.ngrams(lyric, 2))
             tri_lyric=nltk.FreqDist(nltk.ngrams(lyric, 3))
             

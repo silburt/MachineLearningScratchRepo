@@ -7,8 +7,7 @@ import sys
 from utils.process_lyrics import *
 from keras.utils import np_utils
 
-# https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
-def get_embedding_matrix(text_to_int,embed_dim):
+def get_embedding_index(embed_dim=50):
     f = open('utils/glove.6B/glove.6B.%dd.txt'%embed_dim,'r',encoding='utf-8')
     
     embeddings_index = {}
@@ -18,14 +17,19 @@ def get_embedding_matrix(text_to_int,embed_dim):
         coefs = np.asarray(values[1:], dtype='float32')
         embeddings_index[word] = coefs
     f.close()
-    print('Found %s word vectors.' % len(embeddings_index))
 
-    embedding_matrix = np.zeros((len(text_to_int), embed_dim))
+    print('Found %s word vectors.' % len(embeddings_index))
+    return embeddings_index
+
+# https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
+def get_embedding_matrix(embeddings_index,text_to_int,embed_dim):
+    # all text_to_int values by this point should be in embeddings_index
+    
+    # embed matrix has +1 dimension for the zero vector. I.e. end of sentences
+    # are padded with the zero embed vector. 
+    embedding_matrix = np.zeros((len(text_to_int)+1, embed_dim))
     for word, i in text_to_int.items():
-        embedding_vector = embeddings_index.get(word)
-        if embedding_vector is not None:
-            # words not found in embedding index will be all-zeros.
-            embedding_matrix[i] = embedding_vector
+        embedding_matrix[i] = embeddings_index.get(word)
 
     return embedding_matrix
 
@@ -44,11 +48,13 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
         set_ = sorted(list(set(' '.join(songs))))
     elif word_or_character == 'word':
         set_ = []
+        embeddings_index = get_embedding_index()
         for s in songs:
             set_ += s
         set_ = Counter(set_)                    #gets unique sorted dictionary
         for k in list(set_):
-            if set_[k] < min_word_occurrence:   #delete rare words from corpus
+            # delete rare/non-gloVe words from corpus
+            if (set_[k] < min_word_occurrence) or (embeddings_index.get(k) == None):
                 del set_[k]
         set_, vals = zip(*set_.most_common())
 
@@ -58,10 +64,14 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
     int_to_text = dict((i, c) for i, c in enumerate(set_))
     np.save('%sancillary_%s.npy'%(dir_lyrics,word_or_character),[text_to_int,int_to_text,len_set])
     if word_or_character == 'word':
-        embedding_matrix = get_embedding_matrix(text_to_int,embed_dim)        
+        embedding_matrix = get_embedding_matrix(embeddings_index,text_to_int,embed_dim)
         np.save('%sembedding_matrix_%dd.npy'%(dir_lyrics,embed_dim),embedding_matrix)
 
+    print(text_to_int)
+    print(int_to_text)
+
     # get data arrays for training LSTMs
+    # !!! split into sentences and pad short sentences with "zeros", but not 0 cause that maps to an embed vector.
     for sl in seq_length:
         dataX, dataY, data_songnames = [], [], []
         for i in range(n_songs):
@@ -101,11 +111,11 @@ def main(genre,n_songs,seq_length,word_or_character,min_word_occurrence=2,embed_
 
 if __name__ == '__main__':
     n_songs = -1
-    #seq_length = [25,50,75,100,125,150,175,200]
-    seq_length = [4]#,6,8,10,12,15]
-    word_or_character = 'word'
+    seq_length = [25,50,75,100,125,150,175,200]
+    #seq_length = [4]#,6,8,10,12,15]
+    word_or_character = 'character'
 
-    genre = 'country'
-    #genre = 'pop-rock-edm'
+    #genre = 'country'
+    genre = 'pop-rock-edm'
 
     main(genre,n_songs,seq_length,word_or_character)

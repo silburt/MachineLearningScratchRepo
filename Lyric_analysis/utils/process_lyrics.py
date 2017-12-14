@@ -58,13 +58,16 @@ def unicodetoascii(text, word_or_character):
     
     elif word_or_character == 'word':
         TEXT = (text.replace(',','').
-                replace('?','').
-                replace('!','').
-                replace('.','').
+                replace('?',' . ').
+                replace('!',' . ').
+                replace('.',' . ').
                 replace(',','').
                 replace(';','').
+                replace('…',' ').
                 #replace('\n',' \n ').
+                replace('-',' ').
                 replace('"','').
+                replace('`','').
                 replace("'",'')
                 )
     return TEXT
@@ -75,4 +78,5 @@ def process_song(song_dir, word_or_character='character'):
     song = re.sub("[\(\[].*?[\)\]]", "", song)
     if word_or_character == 'word':
         return song.split()
+        #return re.split("(\n)",song)
     return song
