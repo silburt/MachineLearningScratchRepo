@@ -14,7 +14,6 @@ from keras.layers import Dense, LSTM, GRU, Embedding, TimeDistributed
 #from keras.layers import Lambda, Input
 from keras.optimizers import Adam, RMSprop
 from keras.callbacks import ModelCheckpoint
-from keras.utils import np_utils
 from keras.models import load_model
 from keras import backend as K
 from sklearn.model_selection import train_test_split
@@ -38,7 +37,7 @@ def train_model(genre, dir_model, seq_length, batch_size, epochs=100):
         model = Sequential()
         
         model.add(GRU(256, dropout=0.2, recurrent_dropout=0.2, return_sequences=True,
-                      stateful=True, input_shape=(X.shape[1], X.shape[2])))
+                      input_shape=(X.shape[1], X.shape[2])))
         # output shape: (batch_size, seq_len, vocab_size)
         model.add(TimeDistributed(Dense(y.shape[2], activation='softmax')))
         loss = 'categorical_crossentropy'

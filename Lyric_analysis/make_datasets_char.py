@@ -31,35 +31,34 @@ def main(genre, n_songs, seq_length):
     print(int_to_text)
     
     # get data arrays for training TimeDistributed LSTMs
-    for sl in seq_length:
-        dataX, dataY, data_songnames = [], [], []
-        for i in range(n_songs):
-            lyric = songs[i]
-            #print(lyric)
-            for j in range(0,len(lyric)-sl-1):
-                seq_in = lyric[j:j+sl]
-                seq_out = lyric[j+1:j+sl+1]
-                try:
-                    t2i_i = [text_to_int[text] for text in seq_in]
-                    t2i_o = [text_to_int[text] for text in seq_out]
-                    dataX.append(t2i_i)
-                    dataY.append(t2i_o)
-                    data_songnames.append(song_names[i])
-                except:
-                    # a sparse word->int set (rare words removed) is
-                    # going to yield words with no matches
-                    pass
-        n_patterns = len(dataX)
-        print("Total Patterns: ", n_patterns)
+    dataX, dataY, data_songnames = [], [], []
+    for i in range(n_songs):
+        lyric = songs[i]
+        #print(lyric)
+        for j in range(0,len(lyric)-sl-1):
+            seq_in = lyric[j:j+sl]
+            seq_out = lyric[j+1:j+sl+1]
+            try:
+                t2i_i = [text_to_int[text] for text in seq_in]
+                t2i_o = [text_to_int[text] for text in seq_out]
+                dataX.append(t2i_i)
+                dataY.append(t2i_o)
+                data_songnames.append(song_names[i])
+            except:
+                # a sparse word->int set (rare words removed) is
+                # going to yield words with no matches
+                pass
+    n_patterns = len(dataX)
+    print("Total Patterns: ", n_patterns)
 
-        # 1-hot encode the output variable
-        X = np_utils.to_categorical(dataX)
-        y = np_utils.to_categorical(dataY)
+    # 1-hot encode the output variable
+    X = np_utils.to_categorical(dataX)
+    y = np_utils.to_categorical(dataY)
 
-        # save data
-        np.save('%sX_sl%d_char.npy'%(dir_lyrics,sl),X)
-        np.save('%sy_sl%d_char.npy'%(dir_lyrics,sl),y)
-        np.save('%ssong_names_sl%d_char.npy'%(dir_lyrics,sl),data_songnames)
+    # save data
+    np.save('%sX_sl%d_char.npy'%(dir_lyrics,sl),X)
+    np.save('%sy_sl%d_char.npy'%(dir_lyrics,sl),y)
+    np.save('%ssong_names_sl%d_char.npy'%(dir_lyrics,sl),data_songnames)
 
 if __name__ == '__main__':
     n_songs = -1
@@ -69,4 +68,5 @@ if __name__ == '__main__':
     #genre = 'country'
     genre = 'pop-rock-edm'
 
-    temp = main(genre,n_songs,seq_length)
+    for sl in seq_length:
+        main(genre,n_songs,sl)
