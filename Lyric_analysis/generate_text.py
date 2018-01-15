@@ -3,6 +3,18 @@ import sys, glob
 from utils.process_lyrics import *
 from keras.models import load_model
 
+# From https://groups.google.com/forum/#!msg/keras-users/Y_FG_YEkjXs/nSLTa2JK2VoJ
+# "It turns out that the "temperature" for sampling (or more generally the choice of
+# the sampling strategy) is critical to get sensible results. " - Francois Chollet
+def sample(preds, temperature=1.0):
+    # helper function to sample an index from a probability array
+    preds = np.asarray(preds).astype('float64')
+    preds = np.log(preds) / temperature
+    exp_preds = np.exp(preds)
+    preds = exp_preds / np.sum(exp_preds)
+    probas = np.random.multinomial(1, preds, 1)
+    return np.argmax(probas)
+
 # text generation
 def gen(genre,dir_model,seq_length,word_or_character,embed_dim=50):
     dir_lyrics = 'playlists/%s/'%genre

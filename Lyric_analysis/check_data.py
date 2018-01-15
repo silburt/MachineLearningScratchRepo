@@ -1,15 +1,15 @@
 import numpy as np
 np.random.seed(2)
 
-genre = 'pop-rock-edm'
+genre = 'country'
 word_or_character = 'character'
 N_check = 50
 embed_dim = 50
 #seq_length = [4]#,6,8,10,15]
-seq_length = [125]
+seq_length = [25]
 
 dir = 'playlists/%s/'%genre
-text_to_int, int_to_text, n_chars = np.load('%sancillary_%s.npy'%(dir,word_or_character))
+text_to_int, int_to_text, len_set = np.load('%sancillary_%s.npy'%(dir,word_or_character))
 if word_or_character == 'word':
     em = np.load('%sembedding_matrix_%dd.npy'%(dir,embed_dim))
     em_norms = np.sqrt(np.sum(em*em,axis=1))
@@ -27,9 +27,9 @@ for sl in seq_length:
     ran = np.random.randint(0,X.shape[0],N_check)
     for r in ran:
         ex = []
-        for x in X[r]:
-            ex.append(int_to_text[x])
         if word_or_character == 'word':
+            for x in X[r]:
+                ex.append(int_to_text[x])
             y_norm = np.sqrt(np.sum(y[r]*y[r]))
             norm = np.sum(y[r]*em,axis=1)/(em_norms*y_norm)
             argmax = np.argmax(norm)
@@ -41,7 +41,9 @@ for sl in seq_length:
                 print('result',norm[argmax])
                 err_count += 1
         elif word_or_character == 'character':
-            why = int_to_text[y[r]]
+            for x in X[r]:
+                ex.append(int_to_text[int(x[0]*len_set)])
+            why = int_to_text[np.argmax(y[r])]
         print(ex, why, '--', song_names[r])
         print('\n')
 

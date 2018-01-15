@@ -75,7 +75,7 @@ def get_stats(dir, norm, n_songs, print_=0):
 
 ####### Arguments ###########
 if __name__ == '__main__':
-    dirs = ['playlists/edm','playlists/hip-hop','playlists/rock', 'playlists/country', 'playlists/pop']
+    dirs = ['playlists/edm','playlists/rap','playlists/rock', 'playlists/country', 'playlists/pop']
     #dirs = ['playlists/edm','playlists/pop']
     norm = 0
     n_songs = 996
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         data[i] = get_stats(dirs[i],norm,n_songs)
 
     #plot common pairs between genres
-    plot_common = 1
+    plot_common = 0
     if plot_common == 1:
         combos = list(combinations(range(len(dirs)),2))
         pad = 8
@@ -171,9 +171,9 @@ if __name__ == '__main__':
                         counts_ = np.append(counts_,0)
                 if len(np.where(1.5*j + 2 < ranks_)[0]) == len(ranks_)-1:
                     unique_words[i].append(label)
-                if label in ['sun']:
+                if label in ['we']:
                     print(label,ranks_,counts_)
-                if (len(np.where(np.max(ranks_)/1.5 - 2 < ranks_)[0]) == 1) and (len(np.where(np.min(counts_)*1.5 + 3 > counts_)[0]) == 1):
+                if (len(np.where(np.max(ranks_)/1.5 - 2 < ranks_)[0]) == 1) and (np.min(counts_) > 10):
                     if label not in cold_words[np.argmax(ranks_)]:
                         cold_words[np.argmax(ranks_)].append(label)
         

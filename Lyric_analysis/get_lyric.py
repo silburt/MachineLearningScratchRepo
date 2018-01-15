@@ -42,7 +42,11 @@ def extract_lyrics(song_api_path):
     return lyrics.encode("utf-8")
 
 def get_song_lyrics(artist, song):
-    artist, song = clean_names(artist, song)
+    try:
+        artist, song = clean_names(artist, song)
+    except:
+        "bad entry, couldnt clean song entry"
+        return None, artist, song
     search_url = base_url + "/search"
     
     #try song then artist
@@ -72,7 +76,7 @@ def get_song_lyrics(artist, song):
 ###### Main Loop ######
 if __name__ == '__main__':
 
-    dir = 'playlists/edm/'
+    dir = 'playlists/rap/'
     tracks = pd.read_csv(glob.glob('%s*.csv'%dir)[0])
     
     # Main Loop
