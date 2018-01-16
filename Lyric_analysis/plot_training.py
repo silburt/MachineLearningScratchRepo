@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import numpy as np
 
-files = [4,6,8,10,12,15]
-for f in files:
+seq_lengths = [25,50,75,100,125,150,175]
+for seq in seq_lengths:
     #file = 'output/sl%d_word.txt'%f
-    file = 'sl%d_word.txt'%f
+    file = 'output/sl%d_character.txt'%f
 
     lines = open(file,'r').readlines()
     loss = []
