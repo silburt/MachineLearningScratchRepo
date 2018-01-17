@@ -3,16 +3,20 @@
 
 import os
 import numpy as np
+import itertools
 
-seq_length = [25,50,75,100,125,150,175,200]
-#seq_length = [4,6,8,10,12,15]
-word_or_character = 'character'
+n_layers = [1,2,3]
+lstm_size = [128,256,512]
+batch_size = [64,128,256,512]
+
+params = list(itertools.product(*[n_layers, lstm_size, batch_size]))
 
 submit_jobs = 1
 jobs_dir = 'jobs'
 counter = 0
-for sl in seq_length:
-    job_name = 'train_lstm_sl%d_%s.pbs'%(sl,word_or_character)
+for nl,lstms,bs in params:
+    output_name = 'train_sl150_nl%d_size%d_bs%d'%(nl,lstms,bs)
+    job_name = '%s.pbs'%output_name
     with open('%s/%s'%(jobs_dir,job_name), 'w') as f:
         f.write('#!/bin/bash\n')
         f.write('#PBS -l nodes=1:gpus=1\n')
@@ -23,8 +27,7 @@ for sl in seq_length:
         f.write('cd $PBS_O_WORKDIR\n')
         f.write('module load python/3.3.2\n')
         f.write('export PATH="/storage/work/ajs725/conda/install/bin:$PATH"\n\n')
-        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm_char.py %d > output/sl%d_%s.txt'%(sl,sl,word_or_character))
-        #f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm.py %d > output/sl%d_%s.txt'%(sl,sl,word_or_character))
+        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm_char.py %d %d %d > output/%s.txt'%(nl,lstms,bs,output_name))
     f.close()
 
     if submit_jobs == 1:

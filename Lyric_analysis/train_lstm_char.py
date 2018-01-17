@@ -29,13 +29,17 @@ def one_hot_gen(X, Y, vocab_size, seq_length, batch_size=64):
             yield (x, y)
 
 # main routine
-def train_model(genre, dir_model, seq_length, batch_size, epochs=100, lstm_size=256):
+def train_model(genre, dir_model, MP):
     sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #check gpu is being used
+    
+    batch_size = MP['bs']
+    lstm_size = MP['lstm_size']
+    seq_length = MP['seq_length']
     
     text_to_int, int_to_text, n_chars = np.load('playlists/%s/ancillary_char.npy'%genre)
     vocab_size = len(text_to_int)
-    X = np.load('playlists/%s/X_sl%d_char.npy'%(genre,seq_length))
-    y = np.load('playlists/%s/y_sl%d_char.npy'%(genre,seq_length))
+    X = np.load('playlists/%s/X_sl%d_char.npy'%(genre, seq_length))
+    y = np.load('playlists/%s/y_sl%d_char.npy'%(genre, seq_length))
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -45,39 +49,42 @@ def train_model(genre, dir_model, seq_length, batch_size, epochs=100, lstm_size=
     except:
         print("generating new model")
         model = Sequential()
-        #model.add(Embedding(vocab_size, lstm_size, input_length=(batch_size, seq_length))
         model.add(GRU(lstm_size, dropout=0.2, recurrent_dropout=0.2, return_sequences=True,
                       input_shape=(seq_length, vocab_size)))
-        
-        # output shape: (batch_size, seq_len, vocab_size)
-        model.add(TimeDistributed(Dense(vocab_size, activation='softmax')))
-        loss = 'categorical_crossentropy'
+        for i in range(MP['n_layers']-1):
+            model.add(GRU(lstm_size, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+        model.add(TimeDistributed(Dense(vocab_size, activation='softmax'))) #output shape=(bs, sl, vocab)
 
-        lr = 1e-3
         #decay = lr/epochs
         #optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay, clipvalue=1)
-        optimizer = RMSprop(lr=lr)
-        model.compile(loss=loss, optimizer=optimizer)
+        optimizer = RMSprop(lr=MP['lr'])
+        model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
     print(model.summary())
+    epochs = 20
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
     model.fit_generator(one_hot_gen(X_train, y_train, vocab_size, seq_length, batch_size),
                         steps_per_epoch=len(X_train)/batch_size, epochs=epochs, callbacks=callbacks_list,
                         validation_data=one_hot_gen(X_test, y_test, vocab_size, seq_length, batch_size),
                         validation_steps=len(X_test)/batch_size)
-#    model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
-#              callbacks=callbacks_list, validation_data=(X_test, y_test), verbose=1)
     model.save(dir_model)
 
 if __name__ == '__main__':
     genre = 'pop-rock-edm'
-    seq_length = int(sys.argv[1])
-    batch_size = 64
     
-    dir_model = 'models/%s_sl%d_char.h5'%(genre, seq_length)
+    # model parameters
+    MP = {}
+    MP['seq_length'] = 150              # sequence length
+    MP['n_layers'] = int(sys.argv[1])   # number of lstm layers
+    MP['lstm_size'] = int(sys.argv[2])  # lstm size
+    MP['bs'] = int(sys.argv[3])         # batch size
+    MP['lr'] = 1e-3                     # learning rate
     
-    train_model(genre, dir_model, seq_length, batch_size)
+    dir_model = 'models/%s_sl150_nl%d_size%d_bs%d_char.h5'%(genre, MP['n_layers'],
+                                                       MP['lstm_size'], MP['bs'])
+    
+    train_model(genre, dir_model, MP)
 
 
 

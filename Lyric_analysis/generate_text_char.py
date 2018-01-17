@@ -15,25 +15,25 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
+# generate initial sequence
+def init_sequence(genre, seq_length):
+    songs = glob.glob('playlists/%s/*.txt'%genre)
+    seed = np.random.randint(0, len(songs))
+    return list(process_song(songs[seed])[:seq_length])
+
 # text generation
-def gen(genre, seq_length, temperature):
+def gen(genre, seq_length, temperature, ini):
     dir_lyrics = 'playlists/%s/'%genre
-    
     dir_model = 'models/%s_sl%d_char.h5'%(genre, seq_length)
+    
     model = load_model(dir_model)
     text_to_int, int_to_text, len_set = np.load('%sancillary_char.npy'%dir_lyrics)
     vocab_size = len(text_to_int)
-    
-    #generate initial seed
-    songs = glob.glob('%s/*.txt'%dir_lyrics)
-    seed = np.random.randint(0, len(songs))
-    ini = list(process_song(songs[seed])[:seq_length])
-    pattern = [text_to_int[c] for c in list(ini)]
-    print(songs[seed])
-    
+
     # generate text
+    pattern = [text_to_int[c] for c in list(ini)]
     print(''.join([int_to_text[c] for c in pattern]))
-    print("****predicted lyrics:****")
+    print("****predicted lyrics for sl=%d, temp=%f:****"%(seq_length,temperature))
     for i in range(300):
         x = np.eye(vocab_size)[pattern].reshape(1,seq_length,vocab_size)
         preds = model.predict(x, verbose=0)
@@ -41,8 +41,9 @@ def gen(genre, seq_length, temperature):
         
         # sample
         index = sample(pred, temperature)
-
         result = int_to_text[index]
+        
+        # update pattern
         sys.stdout.write(result)
         pattern.append(index)
         pattern = pattern[1:len(pattern)]
@@ -55,6 +56,6 @@ if __name__ == '__main__':
     #seq_lengths = [25,50,75,100,125,150,175,200]
 
     for seq_length in seq_lengths:
-        print('***********seq_length=%d***********'%seq_length)
+        ini_seq = init_sequence(genre, seq_length)
         for temp in temperatures:
-            gen(genre, seq_length, temp)
+            gen(genre, seq_length, temp, ini_seq)
