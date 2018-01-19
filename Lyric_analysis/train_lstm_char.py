@@ -82,7 +82,7 @@ if __name__ == '__main__':
     MP['bs'] = int(sys.argv[3])         # batch size
     MP['dropout'] = float(sys.argv[4])  # dropout fraction
     MP['lr'] = 1e-3                     # learning rate
-    MP['epochs'] = 50                   # n_epochs
+    MP['epochs'] = 100                  # n_epochs
     
     dir_model = 'models/%s_sl150_nl%d_size%d_bs%d_drop%.1f.h5'%(genre, MP['n_layers'],
                                                                 MP['lstm_size'], MP['bs'],
