@@ -37,6 +37,7 @@ def train_model(genre, dir_model, MP):
     seq_length = MP['seq_length']
     drop = MP['dropout']
     epochs = MP['epochs']
+    lr = MP['lr']
     
     text_to_int, int_to_text, n_chars = np.load('playlists/%s/ancillary_char.npy'%genre)
     vocab_size = len(text_to_int)
@@ -59,7 +60,7 @@ def train_model(genre, dir_model, MP):
 
         decay = lr/epochs
         #optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay, clipvalue=1)
-        optimizer = RMSprop(lr=MP['lr'], decay=decay)
+        optimizer = RMSprop(lr=lr, decay=decay)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
     print(model.summary())
