@@ -2,6 +2,7 @@ import numpy as np
 import sys, glob
 from utils.process_lyrics import *
 from keras.models import load_model
+import os
 
 # From https://groups.google.com/forum/#!msg/keras-users/Y_FG_YEkjXs/nSLTa2JK2VoJ
 # Francois Chollet: "It turns out that the 'temperature' for sampling (or more
@@ -15,47 +16,58 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
-# generate initial sequence
-def init_sequence(genre, seq_length):
-    songs = glob.glob('playlists/%s/*.txt'%genre)
-    seed = np.random.randint(0, len(songs))
-    return list(process_song(songs[seed])[:seq_length])
-
 # text generation
-def gen(genre, seq_length, temperature, ini):
+def gen(genre, seq_len, temp, song):
+    
     dir_lyrics = 'playlists/%s/'%genre
-    dir_model = 'models/%s_sl%d_char.h5'%(genre, seq_length)
+    dir_model = 'models/%s_sl%d_char.h5'%(genre, seq_len)
     
     model = load_model(dir_model)
     text_to_int, int_to_text, len_set = np.load('%sancillary_char.npy'%dir_lyrics)
     vocab_size = len(text_to_int)
 
+    # open file and write pred
+    name = song.split('/')[-1].split('.txt')[0]
+    f = open('playlists/%s/pred/%s_sl%s_temp%.2f.txt'%(genre, name, seq_len, temp), 'w')
+
     # generate text
-    pattern = [text_to_int[c] for c in list(ini)]
+    lyrics = process_song(song)
+    n_chars = len(lyrics)
+    f.write(lyrics[:seq_len])
+    pattern = [text_to_int[c] for c in list(lyrics[:seq_len])]
     print(''.join([int_to_text[c] for c in pattern]))
-    print("****predicted lyrics for sl=%d, temp=%f:****"%(seq_length,temperature))
-    for i in range(300):
-        x = np.eye(vocab_size)[pattern].reshape(1,seq_length,vocab_size)
+    print("****predicted lyrics for sl=%d, temp=%f:****"%(seq_len, temp))
+    i, result = 0, ''
+    while True:
+        x = np.eye(vocab_size)[pattern].reshape(1,seq_len, vocab_size)
         preds = model.predict(x, verbose=0)
-        pred = preds.reshape(seq_length,vocab_size)[-1]
+        pred = preds.reshape(seq_len, vocab_size)[-1]
         
         # sample
-        index = sample(pred, temperature)
+        index = sample(pred, temp)
         result = int_to_text[index]
+        f.write(result)
         
         # update pattern
         sys.stdout.write(result)
         pattern.append(index)
         pattern = pattern[1:len(pattern)]
+
+        # break sequence
+        if (i >= n_chars) and (result == '\n'):
+            break
+        i += 1
     print("\nDone.")
+    f.close()
 
 if __name__ == '__main__':
+    n_songs = 1
     genre = 'pop-rock-edm'
-    temperatures = [0.2,0.5,1.0,1.2]
-    seq_lengths = [150]
-    #seq_lengths = [25,50,75,100,125,150,175,200]
+    seq_length = 150
+    temperatures = [0.6]
+    #temperatures = [0.2,0.4,0.6,0.8,1.0,1.2]
 
-    for seq_length in seq_lengths:
-        ini_seq = init_sequence(genre, seq_length)
+    songs = glob.glob('playlists/%s/*.txt'%genre)
+    for i in range(n_songs):
         for temp in temperatures:
-            gen(genre, seq_length, temp, ini_seq)
+            gen(genre, seq_length, temp, songs[i])

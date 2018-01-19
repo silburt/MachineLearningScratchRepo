@@ -35,6 +35,8 @@ def train_model(genre, dir_model, MP):
     batch_size = MP['bs']
     lstm_size = MP['lstm_size']
     seq_length = MP['seq_length']
+    drop = MP['dropout']
+    epochs = MP['epochs']
     
     text_to_int, int_to_text, n_chars = np.load('playlists/%s/ancillary_char.npy'%genre)
     vocab_size = len(text_to_int)
@@ -49,19 +51,18 @@ def train_model(genre, dir_model, MP):
     except:
         print("generating new model")
         model = Sequential()
-        model.add(GRU(lstm_size, dropout=0.2, recurrent_dropout=0.2, return_sequences=True,
+        model.add(GRU(lstm_size, dropout=drop, recurrent_dropout=drop, return_sequences=True,
                       input_shape=(seq_length, vocab_size)))
         for i in range(MP['n_layers']-1):
-            model.add(GRU(lstm_size, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+            model.add(GRU(lstm_size, dropout=drop, recurrent_dropout=drop, return_sequences=True))
         model.add(TimeDistributed(Dense(vocab_size, activation='softmax'))) #output shape=(bs, sl, vocab)
 
-        #decay = lr/epochs
+        decay = lr/epochs
         #optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay, clipvalue=1)
-        optimizer = RMSprop(lr=MP['lr'])
+        optimizer = RMSprop(lr=MP['lr'], decay=decay)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
     print(model.summary())
-    epochs = 20
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
     callbacks_list = [checkpoint]
     model.fit_generator(one_hot_gen(X_train, y_train, vocab_size, seq_length, batch_size),
@@ -79,10 +80,13 @@ if __name__ == '__main__':
     MP['n_layers'] = int(sys.argv[1])   # number of lstm layers
     MP['lstm_size'] = int(sys.argv[2])  # lstm size
     MP['bs'] = int(sys.argv[3])         # batch size
+    MP['dropout'] = float(sys.argv[4])  # dropout fraction
     MP['lr'] = 1e-3                     # learning rate
+    MP['epochs'] = 50                   # n_epochs
     
-    dir_model = 'models/%s_sl150_nl%d_size%d_bs%d_char.h5'%(genre, MP['n_layers'],
-                                                       MP['lstm_size'], MP['bs'])
+    dir_model = 'models/%s_sl150_nl%d_size%d_bs%d_drop%.1f.h5'%(genre, MP['n_layers'],
+                                                                MP['lstm_size'], MP['bs'],
+                                                                MP['dropout'])
     
     train_model(genre, dir_model, MP)
 
