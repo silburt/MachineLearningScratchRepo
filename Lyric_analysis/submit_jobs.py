@@ -11,7 +11,7 @@ lstm_size = [256,512,1024]
 #batch_size = [256,512,1024,2048,4086]
 #dropout = [0.1,0.2,0.3,0.4]
 
-params = list(itertools.product(*[n_layers, lstm_size, batch_size, dropout]))
+params = list(itertools.product(*[genres, n_layers, lstm_size]))
 
 submit_jobs = 1
 jobs_dir = 'jobs'
