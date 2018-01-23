@@ -4,7 +4,6 @@ import numpy as np
 import glob
 import sys
 from utils.process_lyrics import *
-from keras.utils import np_utils
 
 def main(genre, n_songs, seq_length):
     
@@ -14,7 +13,6 @@ def main(genre, n_songs, seq_length):
     songs, song_names, n_songs = [], [], len(files)
     for i,f in enumerate(files):
         song = process_song(f)
-        #print(song)
         songs.append(song)
         song_names.append(f)
 
@@ -54,8 +52,6 @@ def main(genre, n_songs, seq_length):
         # (1-hot encode via a generator in keras)
         X = np.asarray(dataX)
         y = np.asarray(dataY)
-        #X = np_utils.to_categorical(dataX)
-        #y = np_utils.to_categorical(dataY)
 
         # save data
         np.save('%sX_sl%d_char.npy'%(dir_lyrics,sl), X)
@@ -63,11 +59,9 @@ def main(genre, n_songs, seq_length):
         np.save('%ssong_names_sl%d_char.npy'%(dir_lyrics,sl), data_songnames)
 
 if __name__ == '__main__':
-    n_songs = 100
+    n_songs = 1000
     seq_length = [150]
-    #seq_length = [6]#,6,8,10,12,15]
-
-    genre = 'country'
-    #genre = 'pop-rock-edm'
-
-    main(genre, n_songs, seq_length)
+    genres = ['country','edm','rap','rock','pop']
+    
+    for genre in genres:
+        main(genre, n_songs, seq_length)

@@ -120,6 +120,8 @@ def plot_word_freq(dirs, data, n_grams, n_common_words):
         plt.xticks(x, labels, rotation='vertical',fontsize=11)
         plt.ylabel('total counts')
         plt.legend(fontsize=12)
+        plt.yscale('log')
+        plt.xscale('log')
         plt.title(name)
         plt.savefig('images/worddist_%s.png'%name)
         plt.clf()

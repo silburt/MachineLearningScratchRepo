@@ -17,10 +17,9 @@ def sample(preds, temperature=1.0):
     return np.argmax(probas)
 
 # text generation
-def gen(genre, seq_len, temp, song):
+def gen(model, genre, seq_len, temp, song):
     
     dir_lyrics = 'playlists/%s/'%genre
-    dir_model = 'models/%s_sl%d_char.h5'%(genre, seq_len)
     
     model = load_model(dir_model)
     text_to_int, int_to_text, len_set = np.load('%sancillary_char.npy'%dir_lyrics)
@@ -28,7 +27,7 @@ def gen(genre, seq_len, temp, song):
 
     # open file and write pred
     name = song.split('/')[-1].split('.txt')[0]
-    f = open('playlists/%s/pred/%s_sl%s_temp%.2f.txt'%(genre, name, seq_len, temp), 'w')
+    f = open('playlists/%s/pred/%s_sl%s_n2_temp%.2f.txt'%(genre, name, seq_len, temp), 'w')
 
     # generate text
     lyrics = process_song(song)
@@ -64,10 +63,12 @@ if __name__ == '__main__':
     n_songs = 1
     genre = 'pop-rock-edm'
     seq_length = 150
-    temperatures = [0.6]
-    #temperatures = [0.2,0.4,0.6,0.8,1.0,1.2]
+    #temperatures = [0.2]
+    temperatures = [0.2,0.4,0.6,0.8,1.0,1.2]
+    #dir_model = 'models/pop-rock-edm_sl150_nl1_size1024_bs256_drop0.0.h5' #temp=0.4 is nice
+    dir_model = 'models/pop-rock-edm_sl150_nl2_size256_bs256_drop0.0.h5'
 
     songs = glob.glob('playlists/%s/*.txt'%genre)
     for i in range(n_songs):
         for temp in temperatures:
-            gen(genre, seq_length, temp, songs[i])
+            gen(dir_model, genre, seq_length, temp, songs[i])
