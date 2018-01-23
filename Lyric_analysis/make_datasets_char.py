@@ -43,8 +43,6 @@ def main(genre, n_songs, seq_length):
                     dataY.append(t2i_o)
                     data_songnames.append(song_names[i])
                 except:
-                    # a sparse word->int set (rare words removed) is
-                    # going to yield words with no matches
                     pass
         n_patterns = len(dataX)
         print("Total Patterns: ", n_patterns)

@@ -73,15 +73,15 @@ def train_model(genre, dir_model, MP):
     model.save(dir_model)
 
 if __name__ == '__main__':
-    genre = 'pop-rock-edm'
+    genre = sys.argv[1]
     
     # model parameters
     MP = {}
     MP['seq_length'] = 150              # sequence length
-    MP['n_layers'] = int(sys.argv[1])   # number of lstm layers
-    MP['lstm_size'] = int(sys.argv[2])  # lstm size
-    MP['bs'] = int(sys.argv[3])         # batch size
-    MP['dropout'] = float(sys.argv[4])  # dropout fraction
+    MP['n_layers'] = int(sys.argv[2])   # number of lstm layers
+    MP['lstm_size'] = int(sys.argv[3])  # lstm size
+    MP['bs'] = 512                      # batch size
+    MP['dropout'] = 0.2                 # dropout fraction
     MP['lr'] = 1e-3                     # learning rate
     MP['epochs'] = 100                  # n_epochs
     
