@@ -36,8 +36,8 @@ def train_model(genre, dir_model, MP):
     lstm_size = MP['lstm_size']
     seq_length = MP['seq_length']
     drop = MP['dropout']
-    epochs = MP['epochs']
     lr = MP['lr']
+    epochs = MP['epochs']
     
     text_to_int, int_to_text, n_chars = np.load('playlists/%s/ancillary_char.npy'%genre)
     vocab_size = len(text_to_int)
@@ -54,7 +54,7 @@ def train_model(genre, dir_model, MP):
         model = Sequential()
         model.add(GRU(lstm_size, dropout=drop, recurrent_dropout=drop, return_sequences=True,
                       input_shape=(seq_length, vocab_size)))
-        for i in range(MP['n_layers']-1):
+        for i in range(MP['n_layers'] - 1):
             model.add(GRU(lstm_size, dropout=drop, recurrent_dropout=drop, return_sequences=True))
         model.add(TimeDistributed(Dense(vocab_size, activation='softmax'))) #output shape=(bs, sl, vocab)
 
@@ -90,6 +90,3 @@ if __name__ == '__main__':
                                                                 MP['dropout'])
     
     train_model(genre, dir_model, MP)
-
-
-

@@ -63,11 +63,11 @@ def main(genre, n_songs, seq_length):
         np.save('%ssong_names_sl%d_char.npy'%(dir_lyrics,sl), data_songnames)
 
 if __name__ == '__main__':
-    n_songs = -1
-    seq_length = [25,50,75,100,125,150,175,200]
+    n_songs = 100
+    seq_length = [150]
     #seq_length = [6]#,6,8,10,12,15]
 
-    #genre = 'country'
-    genre = 'pop-rock-edm'
+    genre = 'country'
+    #genre = 'pop-rock-edm'
 
     main(genre, n_songs, seq_length)
