@@ -7,7 +7,7 @@ import itertools
 
 genres = ['pop','edm','rock','rap','country']
 n_layers = [1,2]
-lstm_size = [128,256,512,1024]
+lstm_size = [256,512,1024]
 #batch_size = [256,512,1024,2048,4086]
 #dropout = [0.1,0.2,0.3,0.4]
 
