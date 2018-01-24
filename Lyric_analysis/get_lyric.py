@@ -38,8 +38,12 @@ def extract_lyrics(song_api_path):
     page_url = "http://genius.com" + path   #gotta go regular html scraping... come on Genius
     page = requests.get(page_url)
     html = BeautifulSoup(page.text, "html.parser")
-    lyrics = html.find("div", class_="lyrics").get_text() #updated css where the lyrics are based in HTML
-    return lyrics.encode("utf-8")
+    try:
+        lyrics = html.find("div", class_="lyrics").get_text() #updated css where the lyrics are based in HTML
+        return lyrics.encode("utf-8")
+    except:
+        print("Couldn't extract lyrics from genius, skipping")
+        return None
 
 def get_song_lyrics(artist, song):
     try:
@@ -60,7 +64,7 @@ def get_song_lyrics(artist, song):
     response = requests.get(search_url, params={'q': artist}, headers=headers)
     json = response.json()
     for hit in json["response"]["hits"]:
-        if song in hit["result"]["title"].encode("utf-8"):
+        if song in hit["result"]["title"]:
             return extract_lyrics(hit["result"]["api_path"]), artist, song
 
     #last desperate attempt, except for edm this works most often...
