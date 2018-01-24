@@ -53,7 +53,7 @@ def get_song_lyrics(artist, song):
     response = requests.get(search_url, params={'q': song}, headers=headers)
     json = response.json()
     for hit in json["response"]["hits"]:
-        if artist in hit["result"]["primary_artist"]["name"].encode("utf-8"):
+        if artist in hit["result"]["primary_artist"]["name"]:#.encode("utf-8"):
             return extract_lyrics(hit["result"]["api_path"]), artist, song
 
     #try artist then song
@@ -76,7 +76,7 @@ def get_song_lyrics(artist, song):
 ###### Main Loop ######
 if __name__ == '__main__':
 
-    dir = 'playlists/rap/'
+    dir = 'playlists/rock/'
     tracks = pd.read_csv(glob.glob('%s*.csv'%dir)[0])
     
     # Main Loop
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         if lyrics:
             #write to txt file
             artist, song = artist.replace(' ','_').replace('/',''), song.replace(' ','_')
-            with open('%s%s-%s.txt'%(dir,artist,song), 'w') as out:
+            with open('%s%s-%s.txt'%(dir, artist, song), 'wb') as out:
                 out.write(lyrics)
         else:
             print("Couldnt find: %s - %s"%(artist, song))
