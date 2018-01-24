@@ -57,9 +57,8 @@ def unicodetoascii(text, word_or_character):
                 replace('#','number ').
                 replace('%', 'percent').
                 replace('\n\n','\n').
-                replace('/',' and ').
-                replace('\', '')
-                        
+                replace('/',' and ')
+                #replace('\', '')
                 )
     
     elif word_or_character == 'word':

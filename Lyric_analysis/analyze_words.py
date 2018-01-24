@@ -10,6 +10,8 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 from utils.process_lyrics import *
+import random
+random.seed(42)
 
 ####### Statistics Functions ###########
 # gets the rank of each word in the genre
@@ -30,7 +32,7 @@ def get_word_ranks(cnt1, pos1, cnt2, pos2, master_labels, n_words, pad):
 
 # gets word/char counts for each genre
 def get_stats(dir, n_songs, print_=0):
-    files = glob.glob('%s/*.txt'%dir)
+    files = sorted(glob.glob('%s/*.txt'%dir), key=lambda k: random.random())
     if len(files) == 0:
         raise Exception('Directory does not have any songs')
     cnt, bi_cnt, tri_cnt = Counter(), Counter(), Counter()
@@ -167,8 +169,7 @@ def get_unique_words(dirs, data, n_grams, n_common_words, rank_factor=1.5):
 
 ####### Arguments ###########
 if __name__ == '__main__':
-    dir = '../../MachinelearningScratchRepo/Lyric_analysis'
-    dirs = ['%s/playlists/edm'%dir,'%s/playlists/rap'%dir]#,'%s/playlists/rock'%dir, '%s/playlists/country'%dir, '%s/playlists/pop'%dir]
+    dirs = ['playlists/edm','playlists/rap','playlists/rock', 'playlists/country', 'playlists/pop']
     #dirs = ['playlists/edm','playlists/pop']
     n_songs = 1000
     n_grams = 1             # code can extend to 2 and 3 n-grams
@@ -180,12 +181,12 @@ if __name__ == '__main__':
         data[i] = get_stats(dirs[i], n_songs)
 
     #plot common pairs between genres
-    plot_common = 1
+    plot_common = 0
     if plot_common == 1:
         plot_common_pairs(dirs, data, n_grams, n_common_words)
 
     #plot word frequency
-    plot_words = 1
+    plot_words = 0
     if plot_words == 1:
         plot_word_freq(dirs, data, n_grams, n_common_words)
 

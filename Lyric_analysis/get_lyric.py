@@ -94,7 +94,7 @@ if __name__ == '__main__':
             with open('%s%s-%s.txt'%(dir, artist, song), 'wb') as out:
                 out.write(lyrics)
         else:
-            print("Couldnt find: %s - %s"%(artist, song))
+            print("Couldnt find song, skipping")
             skipped_tracks += 1
 
     n_tracks = len(tracks)
