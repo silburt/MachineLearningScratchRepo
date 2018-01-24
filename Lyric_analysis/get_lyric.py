@@ -53,7 +53,7 @@ def get_song_lyrics(artist, song):
     response = requests.get(search_url, params={'q': song}, headers=headers)
     json = response.json()
     for hit in json["response"]["hits"]:
-        if artist in hit["result"]["primary_artist"]["name"]:#.encode("utf-8"):
+        if artist in hit["result"]["primary_artist"]["name"]:
             return extract_lyrics(hit["result"]["api_path"]), artist, song
 
     #try artist then song
