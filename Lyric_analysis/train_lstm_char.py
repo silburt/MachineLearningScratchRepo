@@ -12,7 +12,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, GRU, Embedding, TimeDistributed
 from keras.optimizers import Adam, RMSprop
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.models import load_model
 from keras import backend as K
 from sklearn.model_selection import train_test_split
@@ -62,10 +62,14 @@ def train_model(genre, dir_model, MP):
         #optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay, clipvalue=1)
         optimizer = RMSprop(lr=lr, decay=decay)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
-
     print(model.summary())
+
+    # callbacks
     checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
+    earlystop = EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3)
     callbacks_list = [checkpoint]
+
+    # train
     model.fit_generator(one_hot_gen(X_train, y_train, vocab_size, seq_length, batch_size),
                         steps_per_epoch=len(X_train)/batch_size, epochs=epochs, callbacks=callbacks_list,
                         validation_data=one_hot_gen(X_test, y_test, vocab_size, seq_length, batch_size),

@@ -26,12 +26,17 @@ def gen(model, genre, seq_len, temp, song):
     vocab_size = len(text_to_int)
 
     # open file and write pred
-    name = song.split('/')[-1].split('.txt')[0]
-    f = open('playlists/%s/pred/%s_sl%s_n2_temp%.2f.txt'%(genre, name, seq_len, temp), 'w')
+    song_name = song.split('/')[-1].split('.txt')[0]
+    basename = os.path.basename(dir_model).split('h5')[0]
+    f = open('playlists/model_predictions/%s/%s_temp%.2f.txt'%(genre, basename, temp), 'a')
+    f.write("\n********** Song is %s ********** \n"%song_name)
+    #f = open('playlists/model_predictions/%s/%s_sl%s_n2_temp%.2f.txt'%(genre, name, seq_len, temp), 'w')
+    #f.write("Model used: %s\n\n"%dir_model)
 
     # generate text
     lyrics = process_song(song)
-    n_chars = len(lyrics)
+    #n_chars = len(lyrics)
+    n_chars = 300
     f.write(lyrics[:seq_len])
     pattern = [text_to_int[c] for c in list(lyrics[:seq_len])]
     print(''.join([int_to_text[c] for c in pattern]))
@@ -61,14 +66,14 @@ def gen(model, genre, seq_len, temp, song):
 
 if __name__ == '__main__':
     n_songs = 1
-    genre = 'pop-rock-edm'
+    genre = 'edm'
     seq_length = 150
-    #temperatures = [0.2]
-    temperatures = [0.2,0.4,0.6,0.8,1.0,1.2]
+    temperatures = [0.2,0.4]
     #dir_model = 'models/pop-rock-edm_sl150_nl1_size1024_bs256_drop0.0.h5' #temp=0.4 is nice
-    dir_model = 'models/pop-rock-edm_sl150_nl2_size256_bs256_drop0.0.h5'
+    dir_models = glob.glob('models/edm_*.h5')
 
     songs = glob.glob('playlists/%s/*.txt'%genre)
-    for i in range(n_songs):
-        for temp in temperatures:
-            gen(dir_model, genre, seq_length, temp, songs[i])
+    for dir_model in dir_models:
+        for i in range(n_songs):
+            for temp in temperatures:
+                gen(dir_model, genre, seq_length, temp, songs[i])

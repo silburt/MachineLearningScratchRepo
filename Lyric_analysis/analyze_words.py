@@ -129,7 +129,7 @@ def plot_word_freq(dirs, data, n_grams, n_common_words):
         plt.clf()
 
 # Gets words with disproportionately high/low rank in given genre
-def get_unique_words(dirs, data, n_grams, n_common_words, rank_factor=1.5):
+def get_unique_words(dirs, data, n_grams, n_common_words, rank_factor=1.75):
     labels, counts = [], []
     cold_words = {}     #words popular in other genres but not this one
     unique_words = {}   #words popular in this genre and no other
@@ -169,7 +169,7 @@ def get_unique_words(dirs, data, n_grams, n_common_words, rank_factor=1.5):
 
 ####### Arguments ###########
 if __name__ == '__main__':
-    dirs = ['playlists/edm','playlists/rap','playlists/rock', 'playlists/country', 'playlists/pop']
+    dirs = ['playlists/edm','playlists/rap','playlists/rock', 'playlists/country']
     #dirs = ['playlists/edm','playlists/pop']
     n_songs = 1000
     n_grams = 1             # code can extend to 2 and 3 n-grams
