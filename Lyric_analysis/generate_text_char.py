@@ -68,9 +68,10 @@ if __name__ == '__main__':
     n_songs = 1
     genre = 'edm'
     seq_length = 150
-    temperatures = [0.2,0.4]
+    temperatures = [0.2,0.4,0.6]
     #dir_model = 'models/pop-rock-edm_sl150_nl1_size1024_bs256_drop0.0.h5' #temp=0.4 is nice
-    dir_models = glob.glob('models/edm_*.h5')
+    #dir_models = glob.glob('models/edm_*.h5')
+    dir_models = ['models/edm_sl150_nl1_size1024_bs512_drop0.2.h5']
 
     songs = glob.glob('playlists/%s/*.txt'%genre)
     for dir_model in dir_models:

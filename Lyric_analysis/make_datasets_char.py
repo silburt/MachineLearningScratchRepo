@@ -59,7 +59,7 @@ def main(genre, n_songs, seq_length):
 if __name__ == '__main__':
     n_songs = 1000
     seq_length = [150]
-    genres = ['country','edm','rap','rock','pop']
+    genres = ['country','edm','rap','rock']
     
     for genre in genres:
         main(genre, n_songs, seq_length)

@@ -8,9 +8,16 @@
 #https://groups.google.com/d/msg/keras-users/Y_FG_YEkjXs/QGC58mGHiU8J
 # Reason not to use embedding layer for char-RNN - Yes: we want the output to be a probability distribution over characters. If each character was encoded by a dense vector learned with an Embedding layer, then output sampling would become a K-nearest neighbors problem over the embedding space, which would be much more complex to deal with than a dictionary lookup. But, if you're only using the embedding for the input but you're mapping the output with a simple dictionary, then you'll be fine (i.e. your output is still a probability distribution over characters).
 
+# overfitting discussion - https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden-layers-and-nodes-in-a-feedforward-neural-netw
+
+# reminder: accuracy metrics don't feed into training, they are strictly outputs to gauge overall performance. Only losses actually control training of the network. Dropout can also cause training loss to be higher than validation loss. Dropout is generally not used when calculating validation loss.
+
+# sanity check: http://cs231n.github.io/neural-networks-3/#sanitycheck
+
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, GRU, Embedding, TimeDistributed
+from keras.metrics import categorical_accuracy
 from keras.optimizers import Adam, RMSprop
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.models import load_model
@@ -43,8 +50,13 @@ def train_model(genre, dir_model, MP):
     vocab_size = len(text_to_int)
     X = np.load('playlists/%s/X_sl%d_char.npy'%(genre, seq_length))
     y = np.load('playlists/%s/y_sl%d_char.npy'%(genre, seq_length))
+
+    # randomly shuffle before test/valid split
+    np.random.seed(41)
+    ran = [i for i in range(len(X))]
+    np.random.shuffle(ran)
     
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_valid, y_train, y_valid = train_test_split(X[ran], y[ran], test_size=0.2, random_state=42)
 
     try:
         model = load_model(dir_model)
@@ -58,22 +70,22 @@ def train_model(genre, dir_model, MP):
             model.add(GRU(lstm_size, dropout=drop, recurrent_dropout=drop, return_sequences=True))
         model.add(TimeDistributed(Dense(vocab_size, activation='softmax'))) #output shape=(bs, sl, vocab)
 
-        decay = lr/epochs
-        #optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay, clipvalue=1)
-        optimizer = RMSprop(lr=lr, decay=decay)
-        model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+        decay = 0.5*lr/epochs
+        optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay, clipvalue=1)
+        #optimizer = RMSprop(lr=lr, decay=decay)
+        model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['categorical_accuracy'])
     print(model.summary())
 
     # callbacks
-    checkpoint = ModelCheckpoint(dir_model, monitor='loss', verbose=1, save_best_only=True, mode='min')
-    earlystop = EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3)
+    checkpoint = ModelCheckpoint(dir_model, monitor='loss', save_best_only=True, mode='min')
+    #earlystop = EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3)
     callbacks_list = [checkpoint]
 
     # train
     model.fit_generator(one_hot_gen(X_train, y_train, vocab_size, seq_length, batch_size),
                         steps_per_epoch=len(X_train)/batch_size, epochs=epochs, callbacks=callbacks_list,
-                        validation_data=one_hot_gen(X_test, y_test, vocab_size, seq_length, batch_size),
-                        validation_steps=len(X_test)/batch_size)
+                        validation_data=one_hot_gen(X_valid, y_valid, vocab_size, seq_length, batch_size),
+                        validation_steps=len(X_valid)/batch_size)
     model.save(dir_model)
 
 if __name__ == '__main__':
@@ -85,12 +97,11 @@ if __name__ == '__main__':
     MP['n_layers'] = int(sys.argv[2])   # number of lstm layers
     MP['lstm_size'] = int(sys.argv[3])  # lstm size
     MP['bs'] = 512                      # batch size
-    MP['dropout'] = 0.2                 # dropout fraction
+    MP['dropout'] = 0.0                 # dropout fraction
     MP['lr'] = 1e-3                     # learning rate
-    MP['epochs'] = 100                  # n_epochs
+    MP['epochs'] = 60                   # n_epochs
     
     dir_model = 'models/%s_sl150_nl%d_size%d_bs%d_drop%.1f.h5'%(genre, MP['n_layers'],
                                                                 MP['lstm_size'], MP['bs'],
                                                                 MP['dropout'])
-    
     train_model(genre, dir_model, MP)
