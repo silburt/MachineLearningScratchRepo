@@ -36,7 +36,7 @@ def gen(model, genre, seq_len, temp, song):
     # generate text
     lyrics = process_song(song)
     #n_chars = len(lyrics)
-    n_chars = 300
+    n_chars = 600
     f.write(lyrics[:seq_len])
     pattern = [text_to_int[c] for c in list(lyrics[:seq_len])]
     print(''.join([int_to_text[c] for c in pattern]))
@@ -66,12 +66,12 @@ def gen(model, genre, seq_len, temp, song):
 
 if __name__ == '__main__':
     n_songs = 1
-    genre = 'edm'
+    genre = 'country'
     seq_length = 150
-    temperatures = [0.2,0.4,0.6]
+    temperatures = [0.1,0.2,0.4,0.6]
     #dir_model = 'models/pop-rock-edm_sl150_nl1_size1024_bs256_drop0.0.h5' #temp=0.4 is nice
     #dir_models = glob.glob('models/edm_*.h5')
-    dir_models = ['models/edm_sl150_nl1_size1024_bs512_drop0.2.h5']
+    dir_models = ['models/country_sl150_nl2_size512_bs512_drop0.0.h5']
 
     songs = glob.glob('playlists/%s/*.txt'%genre)
     for dir_model in dir_models:
