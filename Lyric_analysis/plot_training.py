@@ -24,6 +24,7 @@ for file in files:
     plt.plot(x, train_loss, label='train_loss')
     plt.plot(x, val_loss, label='val_loss')
     plt.xlabel('epoch')
+    plt.yscale('log')
     plt.ylabel('categorical crossentropy loss')
     plt.legend(loc='upper right')
 
