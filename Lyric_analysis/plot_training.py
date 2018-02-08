@@ -26,9 +26,8 @@ for file in files:
     plt.plot(x, train_acc, label='train_acc')
     plt.plot(x, val_acc, label='val_acc')
     plt.xlabel('epoch')
-    plt.yscale('log')
     plt.ylabel('categorical crossentropy loss')
-    plt.legend(loc='upper right')
+    plt.legend(loc='upper left')
 
     plt.savefig('%s.png'%file.split('.txt')[0])
     plt.clf()
