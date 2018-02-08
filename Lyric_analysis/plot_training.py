@@ -4,17 +4,19 @@ plt.switch_backend('agg')
 import numpy as np
 import glob
 
-#files = glob.glob('output/train_*.txt')
-files = glob.glob('output/strip.txt')
+files = glob.glob('output/train_*.txt')
 for file in files:
     lines = open(file, 'r', encoding="utf-8").readlines()
-    train_loss, val_loss = [], []
+    train_loss, train_acc, val_loss, val_acc = [], [], [], []
     for i in range(len(lines)):
         l = lines[i]
         if 'val_loss' in l:
             try:
-                train_loss.append(float(lines[i-3].split('loss:')[1].split('\x08')[0]))
-                val_loss.append(float(l.split('val_loss:')[1].split('\x08')[0]))
+                values = l.split('-')
+                train_loss.append(float(values[2].split(':')[1]))
+                train_acc.append(float(values[3].split(':')[1]))
+                val_loss.append(float(values[4].split(':')[1]))
+                val_acc.append(float(values[5].split(':')[1]))
             except:
                 pass
 
