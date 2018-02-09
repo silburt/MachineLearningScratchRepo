@@ -96,8 +96,8 @@ if __name__ == '__main__':
     MP['seq_length'] = 150              # sequence length
     MP['n_layers'] = int(sys.argv[2])   # number of lstm layers
     MP['lstm_size'] = int(sys.argv[3])  # lstm size
-    MP['bs'] = 512                      # batch size
-    MP['dropout'] = 0.0                 # dropout fraction
+    MP['bs'] = int(sys.argv[4])         # batch size
+    MP['dropout'] = int(sys.argv[5])    # dropout fraction
     MP['lr'] = 1e-3                     # learning rate
     MP['epochs'] = 60                   # n_epochs
     
