@@ -71,7 +71,7 @@ if __name__ == '__main__':
     temperatures = [0.1,0.2,0.4,0.6]
     #dir_model = 'models/pop-rock-edm_sl150_nl1_size1024_bs256_drop0.0.h5' #temp=0.4 is nice
     #dir_models = glob.glob('models/edm_*.h5')
-    dir_models = ['models/country_sl150_nl2_size512_bs512_drop0.0.h5']
+    dir_models = ['models/country_sl150_nl1_size512_bs256_drop0.0.h5','country_sl150_nl1_size512_bs512_drop0.0.h5']
 
     songs = glob.glob('playlists/%s/*.txt'%genre)
     for dir_model in dir_models:

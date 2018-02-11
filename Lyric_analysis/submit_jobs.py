@@ -6,10 +6,10 @@ import numpy as np
 import itertools
 
 genres = ['country']
-n_layers = [1]
-lstm_size = [512]
-batch_size = [256,512,1024,2048]
-dropout = [0,0.2,0.4]
+n_layers = [1,2]
+lstm_size = [64,128,256]
+batch_size = [256]
+dropout = [0.2]
 
 params = list(itertools.product(*[genres, n_layers, lstm_size, batch_size, dropout]))
 
@@ -29,7 +29,7 @@ for genre,nl,lstms,bs,drop in params:
         f.write('cd $PBS_O_WORKDIR\n')
         f.write('module load python/3.3.2\n')
         f.write('export PATH="/storage/work/ajs725/conda/install/bin:$PATH"\n\n')
-        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm_char.py %s %d %d %d %d > output/%s.txt'%(genre,nl,lstms,bs,drop,output_name))
+        f.write('CUDA_VISIBLE_DEVICES=0 python train_lstm_char.py %s %d %d %d %f > output/%s.txt'%(genre,nl,lstms,bs,drop,output_name))
     f.close()
 
     if submit_jobs == 1:

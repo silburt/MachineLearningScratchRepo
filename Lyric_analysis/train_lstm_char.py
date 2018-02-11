@@ -97,7 +97,7 @@ if __name__ == '__main__':
     MP['n_layers'] = int(sys.argv[2])   # number of lstm layers
     MP['lstm_size'] = int(sys.argv[3])  # lstm size
     MP['bs'] = int(sys.argv[4])         # batch size
-    MP['dropout'] = int(sys.argv[5])    # dropout fraction
+    MP['dropout'] = float(sys.argv[5])  # dropout fraction
     MP['lr'] = 1e-3                     # learning rate
     MP['epochs'] = 60                   # n_epochs
     
