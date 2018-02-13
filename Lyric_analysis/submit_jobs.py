@@ -6,10 +6,10 @@ import numpy as np
 import itertools
 
 genres = ['country']
-n_layers = [1,2]
-lstm_size = [64,128,256]
-batch_size = [256]
-dropout = [0.2]
+n_layers = [1]
+lstm_size = [128,256,512]
+batch_size = [256,512]
+dropout = [0.2,0.6,0.9]
 
 params = list(itertools.product(*[genres, n_layers, lstm_size, batch_size, dropout]))
 

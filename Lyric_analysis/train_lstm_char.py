@@ -52,7 +52,7 @@ def train_model(genre, dir_model, MP):
     y = np.load('playlists/%s/y_sl%d_char.npy'%(genre, seq_length))
 
     # randomly shuffle samples before test/valid split
-    np.random.seed(41)
+    np.random.seed(40)
     ran = [i for i in range(len(X))]
     np.random.shuffle(ran)
     
